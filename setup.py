@@ -6,7 +6,7 @@
 #
 # NOTE: RD is a new implementation of the original concept.
 #
-# [ DREAMER: Dynamic Resource and Adaptive Mapping EmulatoR ]
+# [ DREAMER: Dynamic REsource and Adaptive Mapping EmulatoR ]
 #
 
 __author__ = 'RADICAL Team'
@@ -36,7 +36,7 @@ setup_args = {
     'name': _PKG_NAME,
     'namespace_packages': ['radical'],
     'version': 0.1,
-    'description': 'Dynamic Resource and Adaptive Mapping EmulatoR',
+    'description': 'Dynamic REsource and Adaptive Mapping EmulatoR',
     # 'long_description' : (read('README.md') + '\n\n' + read('CHANGES.md')),
     'author': __author__,
     'author_email': __email__,

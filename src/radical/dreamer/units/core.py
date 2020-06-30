@@ -7,6 +7,7 @@ class Core(Munch):
     _schema = {
         'uid': str,
         'perf': float,
+        'io_rate': float,
         'util': list,
         'task_history': list
     }
@@ -14,6 +15,7 @@ class Core(Munch):
     _defaults = {
         'uid': '',
         'perf': 1.,
+        'io_rate': 0.,
         'util': [],
         'task_history': []
     }
@@ -31,6 +33,9 @@ class Core(Munch):
         if self.util:
             task.start_time = self.util[-1][1]
         task.end_time = task.start_time + (task.ops / self.perf)
+
+        if self.io_rate:
+            task.end_time += task.ops / self.io_rate
 
         self.util.append([task.start_time, task.end_time])
         self.task_history.append(task.uid)

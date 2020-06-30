@@ -9,12 +9,14 @@ class Resource(Munch):
 
     _schema = {
         'uid': str,
+        'io_rate': float,
         'cores': list,
         'perf_dist': SampleDistribution
     }
 
     _defaults = {
         'uid': '',
+        'io_rate': 0.,
         'cores': []
     }
 
@@ -32,7 +34,8 @@ class Resource(Munch):
             self.uid = generate_id('resource')
 
         if not self.cores:
-            self.cores = [Core(perf=abs(p)) for p in self.perf_dist.generate()]
+            self.cores = [Core(perf=abs(p), io_rate=self.io_rate)
+                          for p in self.perf_dist.generate()]
         else:
             for idx in range(self.num_cores):
                 self.cores[idx] = Core(**self.cores[idx])

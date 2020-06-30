@@ -1,4 +1,4 @@
-# RADICAL-DREAMER: Dynamic Resource and Adaptive Mapping EmulatoR
+# RADICAL-DREAMER: Dynamic REsource and Adaptive Mapping EmulatoR
 
 ## Requirements
 

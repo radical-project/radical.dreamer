@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+__author__ = 'RADICAL Team'
+__email__ = 'radical@rutgers.edu'
+__copyright__ = 'Copyright 2020, RADICAL Research, Rutgers University'
+__license__ = 'MIT'
+
+import argparse
+import sys
+
+from radical.dreamer import ResourceManager, WorkloadManager
+
+
+def get_args():
+    """
+    Get arguments.
+
+    :return: Arguments namespace.
+    :rtype: _AttributeHolder
+    """
+    parser = argparse.ArgumentParser(
+        description='Run the manager for RADICAL-DREAMER.',
+        usage='radical-dreamer-start-manager '
+              '<manager_name> [--cfg_path <config_file>]')
+
+    parser.add_argument(
+        'manager_name',
+        type=str,
+        choices=['resource', 'workload'],
+        help='manager name')
+
+    parser.add_argument(
+        '--cfg_path',
+        dest='cfg_path',
+        type=str,
+        help='path to config file',
+        required=False)
+
+    return parser.parse_args(sys.argv[1:])
+
+
+def proceed(args):
+    """
+    Proceed component execution.
+
+    :param args: Arguments.
+    :type args: _AttributeHolder
+    """
+    manager_cls = {'resource': ResourceManager,
+                   'workload': WorkloadManager}[args.manager_name]
+
+    if args.cfg_path:
+        options = {'cfg_path': args.cfg_path}
+    else:
+        try:
+            from radical.dreamer.configs import cfg_default
+        except ImportError:
+            cfg_default = None
+        options = {'cfg': cfg_default}
+
+    m = manager_cls(**options)
+    m.run()
+
+
+if __name__ == '__main__':
+    proceed(args=get_args())

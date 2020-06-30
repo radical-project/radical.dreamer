@@ -1,0 +1,9 @@
+TODOs:
+   1. Scheduling
+        1.a. "early_binding"
+        1.b. "round_robin"
+   2. Queueing (handle queue Workloads with possible lifetime parameters)
+   3. Central clock (to bring granularity into scheduling)
+   4. Merge Resource- and WorkloadManagers into one manager
+   5. "submission_timestamp" (origin: "submit_at") for Workload (?)
+   6. "exceptions" module

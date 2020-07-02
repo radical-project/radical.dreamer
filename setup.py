@@ -21,7 +21,7 @@ import sys
 _PKG_NAME = 'radical.dreamer'
 
 try:
-    from setuptools import setup, Command, find_packages
+    from setuptools import setup, Command, find_namespace_packages
 except ImportError as e:
     print('%s needs setuptools to install' % _PKG_NAME)
     sys.exit(1)
@@ -63,7 +63,7 @@ setup_args = {
         'Operating System :: Unix'
     ],
     'scripts': ['bin/radical-dreamer-start-manager'],
-    'packages': find_packages('src'),
+    'packages': find_namespace_packages('src', include=['radical.*']),
     'package_dir': {'': 'src'},
     'package_data': {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
     'install_requires': ['radical.utils>=1.4.1',

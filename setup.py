@@ -27,9 +27,9 @@ except ImportError as e:
     sys.exit(1)
 
 
-if sys.hexversion < 0x03050000:
+if sys.hexversion < 0x03060000:
     raise RuntimeError(
-        '[ERROR]: %s requires Python 3.5 or higher' % _PKG_NAME)
+        '[ERROR]: %s requires Python 3.6 or higher' % _PKG_NAME)
 
 
 setup_args = {
@@ -52,7 +52,6 @@ setup_args = {
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Topic :: Utilities',

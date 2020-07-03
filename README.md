@@ -2,7 +2,7 @@
 
 ## Requirements
 
-* Python 3.5 and higher with the following libraries:
+* Python 3.6 and higher with the following libraries:
   * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.4.1 and higher (temporary should be used a brunch that is under development: `pip install git+https://github.com/radical-cybertools/radical.utils.git@feature/config_inheritance`)
   * numpy
   * pika

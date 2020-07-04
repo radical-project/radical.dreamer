@@ -3,7 +3,9 @@
 ## Requirements
 
 * Python 3.6 and higher with the following libraries:
-  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.4.1 and higher (temporary should be used a brunch that is under development: `pip install git+https://github.com/radical-cybertools/radical.utils.git@feature/config_inheritance`)
+  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.4.1 
+  and higher (temporary should be used a branch that is under development: 
+  `pip install git+https://github.com/radical-cybertools/radical.utils.git@feature/config_inheritance`)
   * numpy
   * pika
 * RabbitMQ
@@ -68,4 +70,59 @@ from radical.dreamer import Config, Session
 
 session_1 = Session(cfg_path='./config_data.json')
 session_2 = Session(cfg=Config(cfg_path='./config_data.json'))
+```
+
+## Examples of Resource and Workflow definition
+The following examples of values distributions are applied for both, `Resource` 
+and `Workload`, the same way. More important is the meaning, which user put into
+these descriptions.
+
+### Resource
+1) Cores performance follows a "general" distribution (`number: 36, perf: 
+normal distr {mean: 10., var: 2.}`)
+```python
+resource = Resource(num_cores=36,
+                    perf_dist={'name': 'normal',
+                               'mean': 10.,
+                               'var': 2.})
+```
+2) Each core performance follows its own version of distribution (`number: 36, 
+perf: normal distr {mean: 10., var: 2.}`)
+```python
+resource = Resource(num_cores=36,
+                    perf_dist={'name': 'normal',
+                               'mean': 10.,
+                               'var_local': 2.})
+```
+3) Mean value for each core performance follows a "general" distribution and 
+each core performance follows its own version of distribution (`number: 36, 
+perf: normal distr {mean: 10., var: general -> 2., personal -> 3.}`)
+```python
+resource = Resource(num_cores=36,
+                    perf_dist={'name': 'normal',
+                               'mean': 10.,
+                               'var': 2.,
+                               'var_local': 3.})
+```
+NOTE: For `poisson` distribution, parameters `var` and `var_local` are used 
+as flags only, their values are not taken into account:
+```
+var=1. -> True: poisson distribution produces mean values for cores performance
+var_local=1. -> True: poisson distribution produces values as a personal 
+distribution (each core has its own version of distribution)
+```
+
+### Workload
+1) Homogeneous tasks (`number: 128, ops: 10.`)
+```python
+workload = Workload(num_tasks=128,
+                    ops_dist={'name': 'uniform',
+                              'mean': 10.})
+```
+2) Heterogeneous tasks (`number: 128, ops: normal distr {mean: 5., var: 2.}`)
+```python
+workload = Workload(num_tasks=128,
+                    ops_dist={'name': 'normal',
+                              'mean': 5.,
+                              'var': 2.})
 ```

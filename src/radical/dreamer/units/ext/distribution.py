@@ -17,16 +17,16 @@ class SampleDistribution(Munch):
     _schema = {
         'name': str,
         'mean': float,
-        'sd': float,
-        'sd_init': float,
+        'var': float,
+        'var_local': float,
         'size': int
     }
 
     _defaults = {
         'name': NAMES.Uniform,
         'mean': 1.,
-        'sd': 0.,
-        'sd_init': 0.,
+        'var': 0.,
+        'var_local': 0.,
         'size': 1
     }
 
@@ -43,29 +43,42 @@ class SampleDistribution(Munch):
     def generate(self):
         output = []
 
-        if self.name == self.NAMES.Normal:
+        if self.name == self.NAMES.Uniform:
 
-            if self.sd_init:
-                dist_mean = np.random.normal(self.mean, self.sd_init)
-            else:
-                dist_mean = self.mean
-
-            if self.sd:
-                output = list(np.random.normal(dist_mean, self.sd, self.size))
-            else:
-                output = [dist_mean] * self.size
-
-        elif self.name == self.NAMES.Uniform:
-
-            dist_mean = np.random.uniform(self.mean - self.sd_init,
-                                          self.mean + self.sd_init)
-            output = list(np.random.uniform(dist_mean - self.sd,
-                                            dist_mean + self.sd,
+            # distribution among all elements
+            output = list(np.random.uniform(self.mean - self.var,
+                                            self.mean + self.var,
                                             self.size))
+            # distribution of each element (local distribution)
+            if self.var_local:
+                for i in range(self.size):
+                    output[i] = np.random.uniform(output[i] - self.var_local,
+                                                  output[i] + self.var_local)
+
+        elif self.name == self.NAMES.Normal:
+
+            # distribution among all elements
+            output = list(np.random.normal(self.mean, self.var, self.size))
+            # distribution of each element (local distribution)
+            if self.var_local:
+                for i in range(self.size):
+                    output[i] = np.random.normal(output[i], self.var_local)
 
         elif self.name == self.NAMES.Poisson:
 
-            dist_mean = np.random.poisson(self.mean)
-            output = list(np.random.poisson(dist_mean, self.size))
+            if self.var:  # used as a flag to generate samples
+                # distribution among all elements
+                output = list(np.random.poisson(self.mean, self.size))
+                # convert <class 'numpy.int64'> into <class 'float'>
+                # (numpy types are not JSON serializable)
+                for i in range(self.size):
+                    output[i] = float(output[i])
+            else:
+                output = [self.mean] * self.size
+
+            if self.var_local:  # used as a flag to generate samples
+                # distribution of each element (local distribution)
+                for i in range(self.size):
+                    output[i] = float(np.random.poisson(output[i]))
 
         return output

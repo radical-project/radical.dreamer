@@ -31,17 +31,16 @@ from radical.dreamer.configs import cfg_default
 if __name__ == '__main__':
     # Create a Resource with a specific number of cores,
     # with performance of each core drawn from a distribution
-    resource = Resource(num_cores=128,                 # no. of cores
-                        perf_dist={'name': 'uniform',  # samples distribution
-                                   'mean': 32.,        # mean of distribution
-                                   'sd': 1.,           # standard deviation
-                                   'sd_init': 1.})     # init standard deviation
+    resource = Resource(num_cores=128,
+                        perf_dist={'name': 'uniform',
+                                   'mean': 32.,
+                                   'var': 2.,
+                                   'var_local': 1.})
     # Create a Workload with a specific number of tasks,
     # with number of operations per task drawn from a distribution
-    workload = Workload(num_tasks=128,                 # no. of tasks
-                        ops_dist={'name': 'uniform',   # samples distribution
-                                  'mean': 1024.,       # mean of distribution
-                                  'sd': 4.})           # standard deviation
+    workload = Workload(num_tasks=128,
+                        ops_dist={'name': 'uniform',
+                                  'mean': 1024.})
 
     # Create a Session to publish descriptions of Resource and Workload to RMQ
     session = Session(cfg=cfg_default)

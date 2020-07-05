@@ -6,7 +6,8 @@ from radical.utils import Munch
 
 class _RMQQueues(Munch):
     _schema = {
-        'execute': str,
+        'allocation': str,
+        'request': str,
         'resource': str,
         'schedule': str,
         'session': str,
@@ -47,7 +48,8 @@ class Config(Munch):
             'url': 'amqp://localhost:5672/',
             'exchange': 'rd',  # RMQ exchange
             'queues': {        # RMQ queues/routing_keys
-                'execute': 'execute',
+                'allocation': 'allocation',
+                'request': 'request',
                 'resource': 'resource',
                 'schedule': 'schedule',
                 'session': 'session',

@@ -14,7 +14,8 @@ cfg_default = Config(from_dict={
         'url': 'amqp://localhost:5672/',
         'exchange': 'rd_%s' % RAND_ID,  # RMQ exchange
         'queues': {                     # RMQ queues/routing_keys
-            'execute': 'execute_%s' % RAND_ID,
+            'allocation': 'allocation_%s' % RAND_ID,
+            'request': 'request_%s' % RAND_ID,
             'resource': 'resource_%s' % RAND_ID,
             'schedule': 'schedule_%s' % RAND_ID,
             'session': 'session_%s' % RAND_ID,
@@ -23,7 +24,7 @@ cfg_default = Config(from_dict={
     },
     'session': {
         'output_profile': './profile.json',
-        'schedule_options': ['largest_first', 'smallest_to_fastest'],
+        'schedule_options': ['smallest_to_fastest'],
         'early_binding': True,
         'dynamic_resource': True
     }

@@ -40,7 +40,8 @@ class SampleDistribution(Munch):
             raise ValueError('Possible distributions are following: %s' %
                              ', '.join(self.NAMES.values))
 
-    def generate(self):
+    @property
+    def samples(self):
         output = []
 
         if self.name == self.NAMES.Uniform:

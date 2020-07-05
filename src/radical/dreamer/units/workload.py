@@ -1,4 +1,6 @@
 
+import random
+
 from radical.utils import generate_id, Munch
 
 from .task import Task
@@ -9,13 +11,13 @@ class Workload(Munch):
 
     _schema = {
         'uid': str,
-        'tasks': list,
+        'tasks': dict,
         'ops_dist': SampleDistribution
     }
 
     _defaults = {
         'uid': '',
-        'tasks': []
+        'tasks': {}
     }
 
     def __init__(self, **kwargs):
@@ -32,10 +34,12 @@ class Workload(Munch):
             self.uid = generate_id('workload')
 
         if not self.tasks:
-            self.tasks = [Task(ops=abs(o)) for o in self.ops_dist.generate()]
+            for o in self.ops_dist.samples:
+                task = Task(ops=abs(o))
+                self.tasks[task.uid] = task
         else:
-            for idx in range(self.num_tasks):
-                self.tasks[idx] = Task(**self.tasks[idx])
+            for uid in self.tasks:
+                self.tasks[uid] = Task(**self.tasks[uid])
 
     @property
     def num_tasks(self):
@@ -43,23 +47,45 @@ class Workload(Munch):
 
     def as_dict(self):
         output = super().as_dict()
-        output['tasks'] = [t.as_dict() for t in self.tasks]
+        for uid in output['tasks']:
+            output['tasks'][uid] = output['tasks'][uid].as_dict()
         return output
 
-    def get_tasks(self, *args):
+    def get_task_groups(self, group_size=None, mode=None, prior_sort=False):
         """
-        Get all [or subset] of tasks that are of a certain order (if no
+        Get all [or subset] of grouped tasks that are of a certain order (if no
         conditions are set then all tasks of a random order will be returned).
 
-        :arg value "largest_first" - task with higher OPS goes first
-        :arg value "smallest_first" - task with lower OPS goes first
+        :param group_size: Number of tasks per group (to fit the resource).
+        :type group_size: int/None
+        :param mode: Mode of sorting (largest_first, smallest_first) or random.
+        :type mode: str/None
+        :param prior_sort: Flag to pick prior sorted tasks (early-binding).
+        :type prior_sort: bool
+        :return: Groups of task objects.
+        :rtype: list
         """
-        if 'largest_first' in args:
-            output = sorted(self.tasks, key=lambda t: t.ops, reverse=True)
-        elif 'smallest_first' in args:
-            output = sorted(self.tasks, key=lambda t: t.ops)
+        def _get_groups(data, size=None):
+            size = size or len(data)
+            return [data[i:i + size] for i in range(0, len(data), size)]
+
+        tasks = list(self.tasks.values())
+        if ((group_size and group_size < self.num_tasks and not prior_sort) or
+                mode is None):
+            random.shuffle(tasks)
+            output = _get_groups(tasks, group_size)
         else:
-            from random import shuffle
-            output = list(self.tasks)
-            shuffle(output)
+            output = [tasks]
+
+        if mode:
+            if mode == 'largest_first':
+                for idx in range(len(output)):
+                    output[idx].sort(key=lambda t: t.ops, reverse=True)
+            elif mode == 'smallest_first':
+                for idx in range(len(output)):
+                    output[idx].sort(key=lambda t: t.ops)
+
+            if group_size and prior_sort:
+                output = _get_groups(output[0], group_size)
+
         return output

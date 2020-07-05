@@ -4,7 +4,7 @@ import os
 
 from radical.utils import write_json
 
-from ..units import Core, Task
+from ..units import Task, Resource
 
 from ._base import Manager
 
@@ -19,37 +19,81 @@ class ResourceManager(Manager):
             self._rmq.declare()
 
         self._sid = None
+        self._resource = None
         self._profile_data = {}
+
+    def _get_allocation_ids(self, num_cores):
+        options = {'num': num_cores,
+                   'prior_sort': False if self._cfg.early_binding else True}
+
+        if ('largest_to_fastest' in self._cfg.schedule_options or
+                'smallest_to_fastest' in self._cfg.schedule_options):
+            options['mode'] = 'fastest_first'
+
+        elif ('largest_to_slowest' in self._cfg.schedule_options or
+                'smallest_to_slowest' in self._cfg.schedule_options):
+            options['mode'] = 'slowest_first'
+
+        output = []
+        for core in self._resource.get_cores(**options):
+            output.append(core.uid)
+        return output
 
     def run(self):
         try:
             with self._rmq:
                 while True:
-                    tasks = []
 
                     session_msg = self._rmq.get(self._rmq_queues.session)
                     if session_msg:
-                        self._sid = json.loads(session_msg).get('sid')
+                        session = json.loads(session_msg)
+                        self._sid = session.get('sid')
+                        if self._resource and session.get('new_resource'):
+                            self._resource = None
                         self._logger.info('SessionID received: %s' % self._sid)
 
-                    schedule_msg = self._rmq.get(self._rmq_queues.schedule)
-                    if schedule_msg:
-                        cores_dict = dict()
-                        for s in json.loads(schedule_msg):
-                            task = Task(**s['task'])
-                            core = cores_dict.setdefault(
-                                s['core']['uid'], Core(**s['core']))
-                            core.execute(task)
-                            tasks.append(task)
+                    resource_msg = self._rmq.get(self._rmq_queues.resource)
+                    if resource_msg:
+                        self._resource = Resource(**json.loads(resource_msg))
+                        self._logger.info('Resource %s is received' %
+                                          self._resource.uid)
+
+                    if self._resource and self._sid:
+                        tasks = []
+
+                        num_cores = None
+                        if self._cfg.early_binding:
+                            _msg = None
+                            while not _msg:
+                                # get an allocation request from request-queue
+                                _msg = self._rmq.get(self._rmq_queues.request)
+                            num_cores = json.loads(_msg).get('num_cores')
+
+                        # publish allocated "cores" to allocation-queue
+                        self._rmq.publish(
+                            self._rmq_queues.allocation,
+                            json.dumps(self._get_allocation_ids(num_cores)))
+                        self._logger.info('Allocation (uids) is published')
+
+                        _msg = None
+                        while not _msg:
+                            # get scheduled tasks with cores from schedule-queue
+                            _msg = self._rmq.get(self._rmq_queues.schedule)
+                        # task-groups: [[{t0c0}, {t1c1}], [{t2c0}, {t3c1}]]
+                        for group in json.loads(_msg):
+                            for p in group:
+                                task = Task(**p['task'])
+                                self._resource.cores[p['core']].execute(task)
+                                tasks.append(task)
+                            # after all allocated cores processed another group
+                            # of tasks, then check is resource dynamic (should
+                            # cores performance be re-generated)
+                            if self._cfg.dynamic_resource:
+                                self._resource.generate_cores_perf()
                         self._logger.info('Scheduled tasks are executed')
 
-                        self._rmq.publish(self._rmq_queues.execute,
-                                          json.dumps([c.as_dict() for c in
-                                                      cores_dict.values()]))
-                        self._logger.info('Result of execution is published')
-
-                    if schedule_msg and self._sid:
                         self._set_profile(tasks=tasks)
+                        self._sid = None
 
         except KeyboardInterrupt:
             self._write_profile()

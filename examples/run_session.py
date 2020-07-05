@@ -57,7 +57,8 @@ cfg_data = {
         'url': 'amqp://localhost:5672/',
         'exchange': 'rd_rdcl_857',
         'queues': {
-            'execute': 'execute_rdcl_857',
+            'allocation': 'allocation_rdcl_857',
+            'request': 'request_rdcl_857',
             'resource': 'resource_rdcl_857',
             'schedule': 'schedule_rdcl_857',
             'session': 'session_rdcl_857',
@@ -66,7 +67,7 @@ cfg_data = {
     },
     'session': {
         'output_profile': './profile.json',
-        'schedule_options': ['largest_first', 'smallest_to_fastest'],
+        'schedule_options': ['smallest_to_fastest'],
         'early_binding': True,
         'dynamic_resource': True
     }

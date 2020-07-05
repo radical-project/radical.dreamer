@@ -11,11 +11,12 @@ class Session(Manager):
 
     _NAME = Manager.NAMES.Session
 
-    def __init__(self, cfg=None, cfg_path=None):
+    def __init__(self, cfg=None, cfg_path=None, new_resource=False):
         super().__init__(cfg=cfg, cfg_path=cfg_path)
         with self._rmq:
             self._rmq.publish(self._rmq_queues.session,
-                              json.dumps({'sid': self._uid}))
+                              json.dumps({'sid': self._uid,
+                                          'new_resource': new_resource}))
 
     def set_resource(self, resource):
         """

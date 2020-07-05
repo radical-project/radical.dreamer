@@ -1,7 +1,7 @@
 
 import json
 
-from ..units import Resource, Workload
+from ..units import Workload
 
 from ._base import Manager
 
@@ -15,80 +15,66 @@ class WorkloadManager(Manager):
         with self._rmq:
             self._rmq.declare()
 
-        self._resource = None
         self._workload = None
 
-    @property
-    def _schedule(self):
-        if 'largest_to_fastest' in self._cfg.schedule_options:
-            cores = self._resource.get_cores('fastest_first')
-            tasks = self._workload.get_tasks('largest_first')
+    def _get_schedule(self, cores):
+        options = {'group_size': len(cores),
+                   'prior_sort': True if self._cfg.early_binding else False}
 
-        elif 'smallest_to_fastest' in self._cfg.schedule_options:
-            cores = self._resource.get_cores('fastest_first')
-            tasks = self._workload.get_tasks('smallest_first')
+        if ('largest_to_fastest' in self._cfg.schedule_options or
+                'largest_to_slowest' in self._cfg.schedule_options):
+            options['mode'] = 'largest_first'
 
-        elif 'round_robin' in self._cfg.schedule_options:
-            cores = list(self._resource.cores)
-            tasks = list(self._workload.tasks)
+        elif ('smallest_to_fastest' in self._cfg.schedule_options or
+                'smallest_to_slowest' in self._cfg.schedule_options):
+            options['mode'] = 'smallest_first'
 
-        else:
-            cores = self._resource.get_cores()
-            tasks = self._workload.get_tasks()
-
-        pairs = {}
-        for idx, task in enumerate(tasks):
-            pairs[task.uid] = {'core': cores[idx % len(cores)].as_dict(),
-                               'task': task.as_dict()}
-
-        output = []
-        for task in self._workload.get_tasks(*self._cfg.schedule_options):
-            output.append(pairs[task.uid])
-        return output
+        groups = self._workload.get_task_groups(**options)
+        for g_idx in range(len(groups)):
+            for idx in range(len(groups[g_idx])):
+                groups[g_idx][idx] = {'task': groups[g_idx][idx].as_dict(),
+                                      'core': cores[idx]}
+        return groups
 
     def run(self):
         try:
             with self._rmq:
                 while True:
-
-                    resource_msg = self._rmq.get(self._rmq_queues.resource)
-                    if resource_msg:
-                        self._resource = Resource(**json.loads(resource_msg))
-                        self._logger.info('Resource %s is received' %
-                                          self._resource.uid)
-
-                    if self._resource and self._workload is None:
+                    if self._workload is None:
 
                         workload_msg = self._rmq.get(self._rmq_queues.workload)
                         if not workload_msg:
                             continue
+
                         self._workload = Workload(**json.loads(workload_msg))
                         self._logger.info('Workload %s is received' %
                                           self._workload.uid)
 
-                        # publish "schedule" at schedule-queue
+                        if self._cfg.early_binding:
+                            # publish an allocation request to request-queue
+                            self._rmq.publish(
+                                self._rmq_queues.request,
+                                json.dumps({  # num_cores <= num_tasks
+                                    'num_cores': self._workload.num_tasks}))
+
+                        _msg = None
+                        while not _msg:
+                            # get allocated "cores" from allocation-queue
+                            #   NOTE: the content of each "core" element is not
+                            #   important for now, more important is to have it
+                            #   unique, thus current list of "cores" is actually
+                            #   a list of cores' UIDs
+                            _msg = self._rmq.get(self._rmq_queues.allocation)
+                        cores = json.loads(_msg)
+                        self._logger.info('Received allocation (uids)')
+
+                        # publish "schedule" to schedule-queue
                         self._rmq.publish(self._rmq_queues.schedule,
-                                          json.dumps(self._schedule))
+                                          json.dumps(self._get_schedule(cores)))
                         self._logger.info('Schedule is published')
 
                         self._workload = None
-                        if self._cfg.dynamic_resource:
-                            self._resource.generate_cores_perf()
-                        self._logger.info('Workload [and Resource] are reset')
-
-                        cores_msg = None
-                        while not cores_msg:
-                            # get delivered "cores" from execute-queue
-                            cores_msg = self._rmq.get(self._rmq_queues.execute)
-                        self._logger.info('Received updates for cores')
-
-                        cores = json.loads(cores_msg)
-                        for core in cores:
-                            for c in self._resource.cores:
-                                if core['uid'] == c.uid:
-                                    c.util = core['util']
-                                    c.task_history = core['task_history']
-                        self._logger.info('Cores are updated')
+                        self._logger.info('Workload is reset')
 
         except KeyboardInterrupt:
             self._logger.info('Closing %s' % self._uid)

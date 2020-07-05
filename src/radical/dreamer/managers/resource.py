@@ -4,7 +4,7 @@ import os
 
 from radical.utils import write_json
 
-from ..units import Task, Resource
+from ..units import MultiResource, Resource, Task
 
 from ._base import Manager
 
@@ -54,7 +54,11 @@ class ResourceManager(Manager):
 
                     resource_msg = self._rmq.get(self._rmq_queues.resource)
                     if resource_msg:
-                        self._resource = Resource(**json.loads(resource_msg))
+                        resource = json.loads(resource_msg)
+                        if resource['uid'].startswith('multi'):
+                            self._resource = MultiResource(**resource)
+                        else:
+                            self._resource = Resource(**resource)
                         self._logger.info('Resource %s is received' %
                                           self._resource.uid)
 

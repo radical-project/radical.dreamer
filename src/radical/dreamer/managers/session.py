@@ -2,7 +2,7 @@
 import json
 
 from ..exceptions import RDTypeError
-from ..units import Resource, Workload
+from ..units import MultiResource, Resource, Workload
 
 from ._base import Manager
 
@@ -23,9 +23,9 @@ class Session(Manager):
         Get Resource and publish it to RMQ: routing_key=rabbitmq.queues.resource
 
         :param resource: Resource description.
-        :type resource: radical.dreamer.units.resource.Resource
+        :type resource: radical.dreamer.units.(multi)resource.(Multi)Resource
         """
-        if not isinstance(resource, Resource):
+        if not isinstance(resource, (Resource, MultiResource)):
             raise RDTypeError(expected_type=Resource,
                               actual_type=type(resource))
 

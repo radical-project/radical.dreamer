@@ -5,4 +5,4 @@ __license__ = 'MIT'
 
 from .configs import Config
 from .managers import Session, ResourceManager, WorkloadManager
-from .units import Resource, Workload
+from .units import MultiResource, Resource, Workload

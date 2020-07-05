@@ -58,7 +58,6 @@ class Config(Munch):
         },
         'session': {
             'output_profile': 'profile.json',
-            'schedule_options': [],
             'early_binding': True,
             'dynamic_resource': False
         }
@@ -66,6 +65,7 @@ class Config(Munch):
 
     def __init__(self, from_dict=None, cfg_path=None):
         super().__init__(from_dict=self._defaults)
+        self.session.schedule_options = []
 
         if from_dict:
             self.update(from_dict)

@@ -18,8 +18,7 @@ class Resource(Munch):
 
     _defaults = {
         'uid': '',
-        'io_rate': 0.,
-        'cores': {}
+        'io_rate': 0.
     }
 
     def __init__(self, **kwargs):
@@ -36,6 +35,7 @@ class Resource(Munch):
             self.uid = generate_id('resource')
 
         if not self.cores:
+            self.cores = {}
             for p in self.perf_dist.samples:
                 core = Core(perf=abs(p), io_rate=self.io_rate)
                 self.cores[core.uid] = core

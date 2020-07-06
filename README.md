@@ -111,6 +111,20 @@ var=1. -> True: poisson distribution produces mean values for cores performance
 var_local=1. -> True: poisson distribution produces values as a personal 
 distribution (each core has its own version of distribution)
 ```
+4) Heterogeneous resource or resource with multiple distributions (`total
+ number: 25, perf: 20 cores with normal distr and 5 cores with uniform distr`)
+```python
+resource = MultiResource(resources=[
+        {'num_cores': 20,
+         'perf_dist': {'name': 'normal',
+                       'mean': 5.,
+                       'var': 2.,
+                       'var_local': 1.}},
+        {'num_cores': 5,
+         'perf_dist': {'name': 'uniform',
+                       'mean': 10.}}
+    ])
+```
 
 ### Workload
 1) Homogeneous tasks (`number: 128, ops: 10.`)

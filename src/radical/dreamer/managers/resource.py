@@ -1,5 +1,4 @@
 
-import json
 import os
 
 from radical.utils import write_json
@@ -44,18 +43,16 @@ class ResourceManager(Manager):
             with self._rmq:
                 while True:
 
-                    session_msg = self._rmq.get(self._rmq_queues.session)
-                    if session_msg:
-                        session = json.loads(session_msg)
+                    session = self._rmq.get(self._rmq_queues.session)
+                    if session:
                         self._sid = session.get('sid')
                         if self._resource and session.get('new_resource'):
                             self._resource = None
                         self._logger.info('SessionID received: %s' % self._sid)
 
-                    resource_msg = self._rmq.get(self._rmq_queues.resource)
-                    if resource_msg:
-                        resource = json.loads(resource_msg)
-                        if resource['uid'].startswith('multi'):
+                    resource = self._rmq.get(self._rmq_queues.resource)
+                    if resource:
+                        if resource['uid'].startswith('multiresource'):
                             self._resource = MultiResource(**resource)
                         else:
                             self._resource = Resource(**resource)
@@ -67,24 +64,24 @@ class ResourceManager(Manager):
 
                         num_cores = None
                         if self._cfg.early_binding:
-                            _msg = None
-                            while not _msg:
+                            _data = None
+                            while not _data:
                                 # get an allocation request from request-queue
-                                _msg = self._rmq.get(self._rmq_queues.request)
-                            num_cores = json.loads(_msg).get('num_cores')
+                                _data = self._rmq.get(self._rmq_queues.request)
+                            num_cores = _data.get('num_cores')
 
                         # publish allocated "cores" to allocation-queue
                         self._rmq.publish(
-                            self._rmq_queues.allocation,
-                            json.dumps(self._get_allocation_ids(num_cores)))
+                            queue=self._rmq_queues.allocation,
+                            data=self._get_allocation_ids(num_cores))
                         self._logger.info('Allocation (uids) is published')
 
-                        _msg = None
-                        while not _msg:
+                        schedule = None
+                        while not schedule:
                             # get scheduled tasks with cores from schedule-queue
-                            _msg = self._rmq.get(self._rmq_queues.schedule)
+                            schedule = self._rmq.get(self._rmq_queues.schedule)
                         # task-groups: [[{t0c0}, {t1c1}], [{t2c0}, {t3c1}]]
-                        for group in json.loads(_msg):
+                        for group in schedule:
                             for p in group:
                                 task = Task(**p['task'])
                                 self._resource.cores[p['core']].execute(task)

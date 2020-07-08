@@ -1,6 +1,4 @@
 
-import json
-
 from ..exceptions import RDTypeError
 from ..units import MultiResource, Resource, Workload
 
@@ -14,9 +12,9 @@ class Session(Manager):
     def __init__(self, cfg=None, cfg_path=None, new_resource=False):
         super().__init__(cfg=cfg, cfg_path=cfg_path)
         with self._rmq:
-            self._rmq.publish(self._rmq_queues.session,
-                              json.dumps({'sid': self._uid,
-                                          'new_resource': new_resource}))
+            self._rmq.publish(queue=self._rmq_queues.session,
+                              data={'sid': self._uid,
+                                    'new_resource': new_resource})
 
     def set_resource(self, resource):
         """
@@ -30,8 +28,8 @@ class Session(Manager):
                               actual_type=type(resource))
 
         with self._rmq:
-            self._rmq.publish(self._rmq_queues.resource,
-                              json.dumps(resource.as_dict()))
+            self._rmq.publish(queue=self._rmq_queues.resource,
+                              data=resource.as_dict())
 
     def set_workload(self, workload):
         """
@@ -45,5 +43,5 @@ class Session(Manager):
                               actual_type=type(workload))
 
         with self._rmq:
-            self._rmq.publish(self._rmq_queues.workload,
-                              json.dumps(workload.as_dict()))
+            self._rmq.publish(queue=self._rmq_queues.workload,
+                              data=workload.as_dict())

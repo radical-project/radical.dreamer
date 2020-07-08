@@ -1,4 +1,6 @@
 
+import json
+
 import pika
 import pika.exceptions
 
@@ -61,18 +63,18 @@ class RabbitMQ:
                 pika.exceptions.ChannelWrongStateError):
             pass
 
-    def publish(self, routing_key, body):
+    def publish(self, queue, data):
         """
         Publishing the message.
 
-        :param routing_key: The routing key (or queue name) to bind on.
-        :type routing_key: str
-        :param body: The message body.
-        :type body: str
+        :param queue: Queue name that is used as the routing key to bind on.
+        :type queue: str
+        :param data: Data that will be translated into the message body.
+        :type data: list/dict
         """
         self._channel.basic_publish(exchange=self._exchange,
-                                    routing_key=routing_key,
-                                    body=body)
+                                    routing_key=queue,
+                                    body=json.dumps(data))
 
     def get(self, queue):
         """
@@ -80,8 +82,8 @@ class RabbitMQ:
 
         :param queue: Queue name.
         :type queue: str
-        :return: The message body.
-        :rtype: str
+        :return: Data that is taken from the message body.
+        :rtype: list/dict/None
         """
         try:
             method_frame, header_frame, output = \
@@ -91,4 +93,4 @@ class RabbitMQ:
         except (pika.exceptions.ChannelClosedByBroker,
                 pika.exceptions.ChannelWrongStateError):
             raise KeyboardInterrupt
-        return output
+        return output if not output else json.loads(output)

@@ -31,6 +31,6 @@ class Manager:
         self._rmq_queues = cfg.rabbitmq.queues
 
         self._rmq = RabbitMQ(
-            url=os.environ.get('RADICAL_DREAMER_RMQ_URL', cfg.rabbitmq.url),
+            url=os.environ.get('RADICAL_DREAMER_RMQ_URL') or cfg.rabbitmq.url,
             exchange=cfg.rabbitmq.exchange,
             queues=cfg.rabbitmq.queues)

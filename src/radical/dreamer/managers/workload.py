@@ -1,6 +1,4 @@
 
-import json
-
 from ..units import Workload
 
 from ._base import Manager
@@ -42,35 +40,33 @@ class WorkloadManager(Manager):
                 while True:
                     if self._workload is None:
 
-                        workload_msg = self._rmq.get(self._rmq_queues.workload)
-                        if not workload_msg:
+                        workload = self._rmq.get(self._rmq_queues.workload)
+                        if not workload:
                             continue
 
-                        self._workload = Workload(**json.loads(workload_msg))
+                        self._workload = Workload(**workload)
                         self._logger.info('Workload %s is received' %
                                           self._workload.uid)
 
                         if self._cfg.early_binding:
                             # publish an allocation request to request-queue
                             self._rmq.publish(
-                                self._rmq_queues.request,
-                                json.dumps({  # num_cores <= num_tasks
-                                    'num_cores': self._workload.num_tasks}))
+                                queue=self._rmq_queues.request,
+                                data={'num_cores': self._workload.num_tasks})
 
-                        _msg = None
-                        while not _msg:
+                        cores = None
+                        while not cores:
                             # get allocated "cores" from allocation-queue
                             #   NOTE: the content of each "core" element is not
                             #   important for now, more important is to have it
                             #   unique, thus current list of "cores" is actually
                             #   a list of cores' UIDs
-                            _msg = self._rmq.get(self._rmq_queues.allocation)
-                        cores = json.loads(_msg)
+                            cores = self._rmq.get(self._rmq_queues.allocation)
                         self._logger.info('Received allocation (uids)')
 
                         # publish "schedule" to schedule-queue
-                        self._rmq.publish(self._rmq_queues.schedule,
-                                          json.dumps(self._get_schedule(cores)))
+                        self._rmq.publish(queue=self._rmq_queues.schedule,
+                                          data=self._get_schedule(cores))
                         self._logger.info('Schedule is published')
 
                         self._workload = None

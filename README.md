@@ -8,7 +8,7 @@
   `pip install git+https://github.com/radical-cybertools/radical.utils.git@feature/config_inheritance`)
   * numpy
   * pika
-* RabbitMQ
+* RabbitMQ (either local or remote installation)
 
 ## Executing of provided example
 Setup RabbitMQ URL at each terminal where executable runs (NOTE: this env 
@@ -17,6 +17,11 @@ either Config class or JSON file)
 ```shell script
 export RADICAL_DREAMER_RMQ_URL="amqp://localhost:5672/"
 ```
+NOTE: With provided RabbitMQ URL, it assumes that there is a local installation 
+of RabbitMQ, for remote connection with user/password, please, use the 
+following format `"amqp://<username>:<password>@<host>:<port>/"` ([official 
+docs](https://www.rabbitmq.com/uri-spec.html))
+
 Run ResourceManager (1st terminal)
 ```shell script
 bin/radical-dreamer-start-manager resource

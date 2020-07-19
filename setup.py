@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 #
 # RADICAL-DREAMER (RD) is a successor of WLMS-Emulator (aka RADICAL-Calculator),
-# which was designed and implemented by Vivek Balasubramanian, and later
-# supported and used by Ioannis Paraskevakos, Kartik Rattan, Aydin Saribudak.
-#
-# NOTE: RD is a new implementation of the original concept.
+# it is a renewed implementation of the original concept.
 #
 # [ DREAMER: Dynamic REsource and Adaptive Mapping EmulatoR ]
 #
 
-__author__ = 'RADICAL Team'
-__email__ = 'radical@rutgers.edu'
-__copyright__ = 'Copyright 2020, RADICAL Research, Rutgers University'
-__license__ = 'MIT'
+__author__    = 'RADICAL-Cybertools Team'
+__email__     = 'info@radical-cybertools.org'
+__copyright__ = 'Copyright 2020, The RADICAL-Cybertools Team'
+__license__   = 'MIT'
 
 """ Setup script. Used by easy_install and pip. """
 
@@ -29,7 +26,7 @@ except ImportError as e:
 
 if sys.hexversion < 0x03060000:
     raise RuntimeError(
-        '[ERROR]: %s requires Python 3.6 or higher' % _PKG_NAME)
+        '[ERROR] %s requires Python 3.6 or higher' % _PKG_NAME)
 
 
 setup_args = {

@@ -25,7 +25,7 @@ cfg_default = Config(from_dict={
     'session': {
         'output_profile': './profile.json',
         'schedule_options': ['smallest_to_fastest'],
-        'early_binding': True,
+        'early_binding': False,
         'dynamic_resource': True
     }
 })

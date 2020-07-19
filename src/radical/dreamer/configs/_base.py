@@ -58,7 +58,7 @@ class Config(Munch):
         },
         'session': {
             'output_profile': 'profile.json',
-            'early_binding': True,
+            'early_binding': False,
             'dynamic_resource': False
         }
     }

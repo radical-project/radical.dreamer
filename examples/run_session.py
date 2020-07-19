@@ -16,10 +16,10 @@
 #       (it has the highest priority over other URL definitions)
 #
 
-__author__ = 'RADICAL Team'
-__email__ = 'radical@rutgers.edu'
-__copyright__ = 'Copyright 2020, RADICAL Research, Rutgers University'
-__license__ = 'MIT'
+__author__    = 'RADICAL-Cybertools Team'
+__email__     = 'info@radical-cybertools.org'
+__copyright__ = 'Copyright 2020, The RADICAL-Cybertools Team'
+__license__   = 'MIT'
 
 # import os
 # os.environ['RADICAL_DREAMER_RMQ_URL'] = 'amqp://localhost:5672/'
@@ -68,7 +68,7 @@ cfg_data = {
     'session': {
         'output_profile': './profile.json',
         'schedule_options': ['smallest_to_fastest'],
-        'early_binding': True,
+        'early_binding': False,
         'dynamic_resource': True
     }
 }

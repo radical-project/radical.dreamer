@@ -11,16 +11,16 @@
 * RabbitMQ (either local or remote installation)
 
 ## Executing of provided example
-Setup RabbitMQ URL at each terminal where executable runs (NOTE: this env 
-variable is not needed if the corresponding URL is set in the config using 
-either Config class or JSON file)
+Setup RabbitMQ URL at each terminal where executable runs
 ```shell script
 export RADICAL_DREAMER_RMQ_URL="amqp://localhost:5672/"
 ```
-NOTE: With provided RabbitMQ URL, it assumes that there is a local installation 
-of RabbitMQ, for remote connection with user/password, please, use the 
-following format `"amqp://<username>:<password>@<host>:<port>/"` ([official 
-docs](https://www.rabbitmq.com/uri-spec.html))
+NOTE (1): This env variable is not needed if the corresponding URL is set in 
+the config using either Config class or JSON file
+NOTE (2): With provided RabbitMQ URL, it assumes that there is a local 
+installation of RabbitMQ, for remote connection with user/password, please, 
+use the following format `"amqp://<username>:<password>@<host>:<port>/"` 
+([official docs](https://www.rabbitmq.com/uri-spec.html))
 
 Run ResourceManager (1st terminal)
 ```shell script
@@ -56,7 +56,7 @@ cfg_data = {
     'session': {
         'output_profile': './profile.json',
         'schedule_options': ['smallest_to_fastest'],
-        'early_binding': True,
+        'early_binding': False,
         'dynamic_resource': True
     }
 }

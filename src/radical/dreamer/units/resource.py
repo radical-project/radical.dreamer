@@ -7,51 +7,26 @@ from .core import Core
 from .ext import SampleDistribution
 
 
-class Resource(Munch):
-
-    _schema = {
-        'uid': str,
-        'io_rate': float,
-        'cores': dict,
-        'perf_dist': SampleDistribution
-    }
-
-    _defaults = {
-        'uid': '',
-        'io_rate': 0.
-    }
-
-    def __init__(self, **kwargs):
-        super().__init__(from_dict=self._defaults)
-
-        if 'num_cores' in kwargs:
-            kwargs.setdefault('perf_dist', {})['size'] = kwargs['num_cores']
-            del kwargs['num_cores']
-
-        if kwargs:
-            self.update(kwargs)
-
-        if not self.uid:
-            self.uid = generate_id('resource')
-
-        if not self.cores:
-            self.cores = {}
-            for p in self.perf_dist.samples:
-                core = Core(perf=abs(p), io_rate=self.io_rate)
-                self.cores[core.uid] = core
-        else:
-            for uid in self.cores:
-                self.cores[uid] = Core(**self.cores[uid])
+class ResourceCoresMixin:
 
     @property
     def num_cores(self):
         return len(self.cores)
 
-    def as_dict(self):
-        output = super().as_dict()
-        for uid in output['cores']:
-            output['cores'][uid] = output['cores'][uid].as_dict()
-        return output
+    @staticmethod
+    def reorder_cores(cores, mode=None):
+        """
+        Reorder cores according to the mode (input parameter will be changed).
+
+        :param cores: Core objects.
+        :type cores: list
+        :param mode: Mode of sorting (fastest_first, slowest_first).
+        :type mode: str/None
+        """
+        if mode == 'fastest_first':
+            cores.sort(key=lambda c: c.perf, reverse=True)
+        elif mode == 'slowest_first':
+            cores.sort(key=lambda c: c.perf)
 
     def get_cores(self, num=None, mode=None, prior_sort=False):
         """
@@ -73,14 +48,54 @@ class Resource(Munch):
             output = output[:num]
 
         if mode:
-            if mode == 'fastest_first':
-                output.sort(key=lambda c: c.perf, reverse=True)
-            elif mode == 'slowest_first':
-                output.sort(key=lambda c: c.perf)
+            self.reorder_cores(output, mode)
 
             if num and prior_sort:
                 output = output[:num]
 
+        return output
+
+
+class Resource(ResourceCoresMixin, Munch):
+
+    _schema = {
+        'uid': str,
+        'io_rate': float,
+        'cores': dict,
+        'perf_dist': SampleDistribution
+    }
+
+    _defaults = {
+        'uid': '',
+        'io_rate': 0.
+    }
+
+    def __init__(self, **kwargs):
+        Munch.__init__(self, from_dict=self._defaults)
+
+        if 'num_cores' in kwargs:
+            kwargs.setdefault('perf_dist', {})['size'] = kwargs['num_cores']
+            del kwargs['num_cores']
+
+        if kwargs:
+            self.update(kwargs)
+
+        if not self.uid:
+            self.uid = generate_id('resource')
+
+        if not self.cores:
+            self.cores = {}
+            for p in self.perf_dist.samples:
+                core = Core(perf=abs(p), io_rate=self.io_rate)
+                self.cores[core.uid] = core
+        else:
+            for uid in self.cores:
+                self.cores[uid] = Core(**self.cores[uid])
+
+    def as_dict(self):
+        output = super().as_dict()
+        for uid in output['cores']:
+            output['cores'][uid] = output['cores'][uid].as_dict()
         return output
 
     def generate_cores_perf(self):

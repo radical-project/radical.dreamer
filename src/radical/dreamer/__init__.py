@@ -1,7 +1,7 @@
-__author__ = 'RADICAL Team'
-__email__ = 'radical@rutgers.edu'
-__copyright__ = 'Copyright 2020, RADICAL Research, Rutgers University'
-__license__ = 'MIT'
+__author__    = 'RADICAL-Cybertools Team'
+__email__     = 'info@radical-cybertools.org'
+__copyright__ = 'Copyright 2020, The RADICAL-Cybertools Team'
+__license__   = 'MIT'
 
 from .configs import Config
 from .managers import Session, ResourceManager, WorkloadManager

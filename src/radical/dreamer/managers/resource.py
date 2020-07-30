@@ -86,11 +86,10 @@ class ResourceManager(Manager):
                                 task = Task(**p['task'])
                                 self._resource.cores[p['core']].execute(task)
                                 tasks.append(task)
-                            # after all allocated cores processed another group
-                            # of tasks, then check is resource dynamic (should
-                            # cores performance be re-generated)
-                            if self._cfg.dynamic_resource:
-                                self._resource.generate_cores_perf()
+                            # after all allocated cores process another group of
+                            # tasks check resource dynamism (re-generate cores
+                            # performance if resource is dynamic)
+                            self._resource.dynamic_consistency_adjustment()
                         self._logger.info('Scheduled tasks are executed')
 
                         self._set_profile(tasks=tasks)

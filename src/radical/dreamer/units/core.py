@@ -15,13 +15,13 @@ class Core(Munch):
     _defaults = {
         'uid': '',
         'perf': 1.,
-        'io_rate': 0.
+        'io_rate': 0.,
+        'util': [],
+        'task_history': []
     }
 
     def __init__(self, **kwargs):
         super().__init__(from_dict=self._defaults)
-        self.util = []
-        self.task_history = []
 
         if kwargs:
             self.update(kwargs)

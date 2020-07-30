@@ -14,7 +14,6 @@
     "session": {
         "output_profile": "./profile.json",
         "schedule_options": ["smallest_to_fastest"],
-        "early_binding": false,
-        "dynamic_resource": true
+        "early_binding": true
     }
 }

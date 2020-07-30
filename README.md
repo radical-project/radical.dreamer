@@ -57,8 +57,7 @@ cfg_data = {
     'session': {
         'output_profile': './profile.json',
         'schedule_options': ['smallest_to_fastest'],
-        'early_binding': False,
-        'dynamic_resource': True
+        'early_binding': True
     }
 }
 session = Session(cfg=Config(cfg_data))
@@ -130,6 +129,11 @@ resource = MultiResource(resources=[{'num_cores': 20,
                                      'perf_dist': {'name': 'uniform',
                                                    'mean': 10.}}])
 ```
+5) Additional parameters for resource definition
+ - `io_rate` (`float`) - I/O abstraction to add time for task spent on I/O
+  processes (assume that I/O includes data transfers and network throughput)
+ - `is_dynamic` (`bool`) - flag that defines is [multi]resource dynamic or not
+  (initially it was part of the configuration data)
 
 ### Workload
 1) Homogeneous tasks (`number: 128, ops: 10.`)

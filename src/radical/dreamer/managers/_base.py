@@ -22,10 +22,10 @@ class Manager:
 
         if not cfg and not cfg_path:
             # cfg = Config(from_dict={})
-            raise Exception('Configuration is not set.')
+            raise Exception('Configuration is not set')
         elif not cfg and cfg_path:
             cfg = Config(cfg_path=cfg_path)
-        self._logger.info('Configuration is set.')
+        self._logger.info('Configuration is set')
 
         self._cfg = cfg.session
         self._rmq_queues = cfg.rabbitmq.queues

@@ -13,15 +13,23 @@ class MultiResource(ResourceCoresMixin, Munch):
     }
 
     _defaults = {
-        'uid': ''
+        'uid': '',
+        'cores': {}
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, resources, **kwargs):
         Munch.__init__(self, from_dict=self._defaults)
-        self.cores = {}
 
-        if kwargs:
-            self.update(kwargs)
+        if not resources:
+            raise Exception('[Sub]resources are not set')
+
+        if 'is_dynamic' in kwargs:
+            for idx in range(len(resources)):
+                resources[idx]['is_dynamic'] = kwargs['is_dynamic']
+            del kwargs['is_dynamic']
+
+        kwargs['resources'] = resources
+        self.update(kwargs)
 
         if not self.uid:
             self.uid = generate_id('multiresource')
@@ -38,9 +46,9 @@ class MultiResource(ResourceCoresMixin, Munch):
                 output['cores'][uid] = output['resources'][idx]['cores'][uid]
         return output
 
-    def generate_cores_perf(self):
+    def dynamic_consistency_adjustment(self):
         """
-        Re-generate new Perf values for all cores.
+        Re-generate cores performance for any dynamic resource.
         """
         for resource in self.resources:
-            resource.generate_cores_perf()
+            resource.dynamic_consistency_adjustment()

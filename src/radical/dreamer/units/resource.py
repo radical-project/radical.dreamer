@@ -61,13 +61,15 @@ class Resource(ResourceCoresMixin, Munch):
     _schema = {
         'uid': str,
         'io_rate': float,
+        'is_dynamic': bool,
         'cores': dict,
         'perf_dist': SampleDistribution
     }
 
     _defaults = {
         'uid': '',
-        'io_rate': 0.
+        'io_rate': 0.,
+        'is_dynamic': False
     }
 
     def __init__(self, **kwargs):
@@ -98,10 +100,11 @@ class Resource(ResourceCoresMixin, Munch):
             output['cores'][uid] = output['cores'][uid].as_dict()
         return output
 
-    def generate_cores_perf(self):
+    def dynamic_consistency_adjustment(self):
         """
-        Re-generate new Perf values for all cores.
+        If resource is dynamic, then re-generate cores performance.
         """
-        perf_values = self.perf_dist.samples
-        for idx, core in enumerate(self.cores.values()):
-            core.perf = abs(perf_values[idx])
+        if self.is_dynamic:
+            perf_values = self.perf_dist.samples
+            for idx, core in enumerate(self.cores.values()):
+                core.perf = abs(perf_values[idx])

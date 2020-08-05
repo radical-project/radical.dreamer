@@ -3,7 +3,7 @@
 ## Requirements
 
 * Python 3.6+ with the following libraries:
-  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5+
+  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5.2+
   * numpy
   * pika
 * RabbitMQ (either local or remote installation)

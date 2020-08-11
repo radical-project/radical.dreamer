@@ -90,9 +90,9 @@ Another option is to have all that parameters in the dedicated JSON file (e.g.,
 file as config.
 ```shell script
 # run ResourceManager
-bin/radical-dreamer-start-manager resource --cfg_path examples/config_data.json
+radical-dreamer-start-manager resource --cfg_path examples/config_data.json
 # run WorkloadManager
-bin/radical-dreamer-start-manager workload --cfg_path examples/config_data.json
+radical-dreamer-start-manager workload --cfg_path examples/config_data.json
 ```
 ```python
 from radical.dreamer import Config, Session

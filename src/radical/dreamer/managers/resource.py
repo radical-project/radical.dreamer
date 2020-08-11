@@ -27,11 +27,11 @@ class ResourceManager(Manager):
 
         if ('largest_to_fastest' in self._cfg.schedule_options or
                 'smallest_to_fastest' in self._cfg.schedule_options):
-            options['mode'] = 'fastest_first'
+            options['order_reverse'] = True
 
         elif ('largest_to_slowest' in self._cfg.schedule_options or
                 'smallest_to_slowest' in self._cfg.schedule_options):
-            options['mode'] = 'slowest_first'
+            options['order_reverse'] = False
 
         output = []
         for core in self._resource.get_cores(**options):

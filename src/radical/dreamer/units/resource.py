@@ -14,44 +14,42 @@ class ResourceCoresMixin:
         return len(self.cores)
 
     @staticmethod
-    def reorder_cores(cores, mode=None):
+    def reorder_cores(cores, reverse=None):
         """
         Reorder cores according to the mode (input parameter will be changed).
 
         :param cores: Core objects.
         :type cores: list
-        :param mode: Mode of sorting (fastest_first, slowest_first).
-        :type mode: str/None
+        :param reverse: Sorting direction (reverse=True -> fastest_first).
+        :type reverse: bool/None
         """
-        if mode == 'fastest_first':
-            cores.sort(key=lambda c: c.perf, reverse=True)
-        elif mode == 'slowest_first':
-            cores.sort(key=lambda c: c.perf)
+        if reverse is not None:
+            cores.sort(key=lambda c: c.perf, reverse=reverse)
 
-    def get_cores(self, num=None, mode=None, prior_sort=False):
+    def get_cores(self, num=None, order_reverse=None, prior_sort=False):
         """
         Get all [or subset] of cores that are of a certain order (if no
         conditions are set then all cores of a random order will be returned).
 
         :param num: Number of returned cores, if None then return all cores.
         :type num: int/None
-        :param mode: Mode of sorting (fastest_first, slowest_first) or random.
-        :type mode: str/None
+        :param order_reverse: Sorting direction.
+        :type order_reverse: bool/None
         :param prior_sort: Flag to pick prior sorted cores (late-binding).
         :type prior_sort: bool
         :return: Core objects.
         :rtype: list
         """
         output = list(self.cores.values())
-        if (num and num < self.num_cores and not prior_sort) or mode is None:
+        if ((num and num < self.num_cores and not prior_sort) or
+                order_reverse is None):
             random.shuffle(output)
             output = output[:num]
 
-        if mode:
-            self.reorder_cores(output, mode)
+        self.reorder_cores(output, order_reverse)
 
-            if num and prior_sort:
-                output = output[:num]
+        if num and prior_sort and order_reverse is not None:
+            output = output[:num]
 
         return output
 

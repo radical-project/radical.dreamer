@@ -21,11 +21,11 @@ class WorkloadManager(Manager):
 
         if ('largest_to_fastest' in self._cfg.schedule_options or
                 'largest_to_slowest' in self._cfg.schedule_options):
-            options['mode'] = 'largest_first'
+            options['order_reverse'] = True
 
         elif ('smallest_to_fastest' in self._cfg.schedule_options or
                 'smallest_to_slowest' in self._cfg.schedule_options):
-            options['mode'] = 'smallest_first'
+            options['order_reverse'] = False
 
         groups = self._workload.get_task_groups(**options)
         for g_idx in range(len(groups)):

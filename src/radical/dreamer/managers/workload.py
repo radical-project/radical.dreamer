@@ -35,6 +35,9 @@ class WorkloadManager(Manager):
         return groups
 
     def run(self):
+        print('[INFO] Do not close until all sessions are processed\n'
+              '[INFO] Workload Manager running...')
+
         try:
             with self._rmq:
                 while True:
@@ -73,6 +76,7 @@ class WorkloadManager(Manager):
                         self._logger.info('Workload is reset')
 
         except KeyboardInterrupt:
+            print('[INFO] Workload Manager stopped')
             self._logger.info('Closing %s' % self._uid)
 
         except Exception as e:

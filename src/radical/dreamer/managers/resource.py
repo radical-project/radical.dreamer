@@ -39,6 +39,9 @@ class ResourceManager(Manager):
         return output
 
     def run(self):
+        print('[INFO] Do not close until all sessions are processed\n'
+              '[INFO] Resource Manager running...')
+
         try:
             with self._rmq:
                 while True:
@@ -97,6 +100,7 @@ class ResourceManager(Manager):
 
         except KeyboardInterrupt:
             self._write_profile()
+            print('[INFO] Resource Manager stopped')
             self._logger.info('Closing %s' % self._uid)
 
         except Exception as e:

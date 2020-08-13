@@ -3,7 +3,7 @@
 ## Requirements
 
 * Python 3.6+ with the following libraries:
-  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5.2+
+  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5.3+
   * numpy
   * pika
 * RabbitMQ (**running** instance that is installed either locally or remotely)
@@ -66,16 +66,7 @@ from radical.dreamer import Config, Session
 
 cfg_data = {
     'rabbitmq': {
-        'url': 'amqp://localhost:5672/',
-        'exchange': 'rd_rdcl_857',                # any random str value
-        'queues': {
-            'allocation': 'allocation_rdcl_857',  # any random str value
-            'request': 'request_rdcl_857',        # any random str value
-            'resource': 'resource_rdcl_857',      # any random str value
-            'schedule': 'schedule_rdcl_857',      # any random str value
-            'session': 'session_rdcl_857',        # any random str value
-            'workload': 'workload_rdcl_857'       # any random str value
-        }
+        'url': 'amqp://localhost:5672/'
     },
     'session': {
         'output_profile': './profile.json',

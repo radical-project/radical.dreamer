@@ -1,7 +1,19 @@
 
 import json
+import socket
 
 from radical.utils import Munch
+
+try:
+    import getpass
+except ImportError:
+    getpass = None
+
+# UNIQ_ID should be in sync with all managers, thus all of them should be
+# running under the same user account and at the same machine OR rabbitmq's
+# exchange and queue names could be set by user in the corresponding config.
+UNIQ_ID = '%s.%s' % ('nouser' if getpass is None else getpass.getuser(),
+                     socket.gethostname())
 
 
 class _RMQQueues(Munch):
@@ -45,14 +57,14 @@ class Config(Munch):
     _defaults = {
         'rabbitmq': {
             'url': 'amqp://localhost:5672/',
-            'exchange': 'rd',  # RMQ exchange
-            'queues': {        # RMQ queues/routing_keys
-                'allocation': 'allocation',
-                'request': 'request',
-                'resource': 'resource',
-                'schedule': 'schedule',
-                'session': 'session',
-                'workload': 'workload'
+            'exchange': 'rd.%s' % UNIQ_ID,  # RMQ exchange
+            'queues': {                     # RMQ queues/routing_keys
+                'allocation': 'rd.allocation.%s' % UNIQ_ID,
+                'request': 'rd.request.%s' % UNIQ_ID,
+                'resource': 'rd.resource.%s' % UNIQ_ID,
+                'schedule': 'rd.schedule.%s' % UNIQ_ID,
+                'session': 'rd.session.%s' % UNIQ_ID,
+                'workload': 'rd.workload.%s' % UNIQ_ID
             }
         },
         'session': {

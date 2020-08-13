@@ -39,7 +39,7 @@ setup_args = {
     'author_email': __email__,
     'maintainer': __author__,
     'maintainer_email': __email__,
-    # 'url': 'https://github.com/radical-cybertools/%s' % _PKG_NAME,
+    'url': 'https://github.com/radical-project/%s' % _PKG_NAME,
     'license': 'MIT',
     'keywords': 'radical workload resource execution emulator',
     'classifiers':  [
@@ -62,7 +62,7 @@ setup_args = {
     'packages': find_namespace_packages('src', include=['radical.*']),
     'package_dir': {'': 'src'},
     'package_data': {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
-    'install_requires': ['radical.utils>=1.5.2',
+    'install_requires': ['radical.utils>=1.5.3',
                          'numpy',
                          'pika'],
     'tests_require': ['pytest',

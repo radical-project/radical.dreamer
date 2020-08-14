@@ -26,13 +26,13 @@ except ImportError as e:
 
 if sys.hexversion < 0x03060000:
     raise RuntimeError(
-        '[ERROR] %s requires Python 3.6 or higher' % _PKG_NAME)
+        '[ERROR] %s requires Python 3.6+' % _PKG_NAME)
 
 
 setup_args = {
     'name': _PKG_NAME,
     'namespace_packages': ['radical'],
-    'version': 0.1,
+    'version': '0.1.1',
     'description': 'Dynamic REsource and Adaptive Mapping EmulatoR',
     # 'long_description' : (read('README.md') + '\n\n' + read('CHANGES.md')),
     'author': __author__,

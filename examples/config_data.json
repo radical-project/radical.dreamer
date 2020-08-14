@@ -1,15 +1,6 @@
 {
     "rabbitmq": {
-        "url": "amqp://localhost:5672/",
-        "exchange": "rd_rdcl_857",
-        "queues": {
-            "allocation": "allocation_rdcl_857",
-            "request": "request_rdcl_857",
-            "resource": "resource_rdcl_857",
-            "schedule": "schedule_rdcl_857",
-            "session": "session_rdcl_857",
-            "workload": "workload_rdcl_857"
-        }
+        "url": "amqp://localhost:5672/"
     },
     "session": {
         "output_profile": "./profile.json",

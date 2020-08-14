@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
 # Resource- and Workload-Managers should be run first:
-#   bin/radical-dreamer-start-manager resource [--cfg_path config_data.json]
-#   bin/radical-dreamer-start-manager workload [--cfg_path config_data.json]
+#   radical-dreamer-start-manager resource [--cfg_path config_data.json]
+#   radical-dreamer-start-manager workload [--cfg_path config_data.json]
 #
 # Config "cfg_default" is used as an example and should be overwritten by user
 # (should be consistent with managers - to use ONLY one configuration) to
@@ -56,16 +56,7 @@ from radical.dreamer import Config, Session
 
 cfg_data = {
     'rabbitmq': {
-        'url': 'amqp://localhost:5672/',
-        'exchange': 'rd_rdcl_857',
-        'queues': {
-            'allocation': 'allocation_rdcl_857',
-            'request': 'request_rdcl_857',
-            'resource': 'resource_rdcl_857',
-            'schedule': 'schedule_rdcl_857',
-            'session': 'session_rdcl_857',
-            'workload': 'workload_rdcl_857'
-        }
+        'url': 'amqp://localhost:5672/'
     },
     'session': {
         'output_profile': './profile.json',
@@ -76,7 +67,7 @@ cfg_data = {
 session = Session(cfg=Config(cfg_data))
 
 #   Also, "cfg_data" can be stored in JSON file and corresponding path used to 
-#   initialize the config for Session and Resource/WorkloadManager(s):
+#   initialize the config for Session and Resource-/Workload-Managers:
 #      session = Session(cfg=Config(cfg_path='./config_data.json'))
 #   or
 #      session = Session(cfg_path='./config_data.json')

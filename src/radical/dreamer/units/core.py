@@ -21,10 +21,7 @@ class Core(Munch):
     }
 
     def __init__(self, **kwargs):
-        super().__init__(from_dict=self._defaults)
-
-        if kwargs:
-            self.update(kwargs)
+        super().__init__(from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('core')

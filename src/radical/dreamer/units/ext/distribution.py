@@ -30,18 +30,12 @@ class SampleDistribution(Munch):
         'size': 1
     }
 
-    def __init__(self, from_dict=None):
-        super().__init__(from_dict=self._defaults)
-
-        if from_dict:
-            self.update(from_dict)
-
+    @property
+    def samples(self):
         if self.name not in self.NAMES.values:
             raise ValueError('Possible distributions are following: %s' %
                              ', '.join(self.NAMES.values))
 
-    @property
-    def samples(self):
         output = []
 
         if self.name == self.NAMES.Uniform:

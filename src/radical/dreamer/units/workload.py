@@ -21,24 +21,21 @@ class Workload(Munch):
     }
 
     _defaults = {
-        'uid': ''
+        'uid': '',
+        'tasks': {}
     }
 
     def __init__(self, **kwargs):
-        super().__init__(from_dict=self._defaults)
-
         if 'num_tasks' in kwargs:
             kwargs.setdefault('ops_dist', {})['size'] = kwargs['num_tasks']
             del kwargs['num_tasks']
 
-        if kwargs:
-            self.update(kwargs)
+        super().__init__(from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('workload')
 
         if not self.tasks:
-            self.tasks = {}
             for o in self.ops_dist.samples:
                 task = Task(ops=abs(o))
                 self.tasks[task.uid] = task

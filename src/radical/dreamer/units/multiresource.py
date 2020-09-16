@@ -18,10 +18,8 @@ class MultiResource(ResourceCoresMixin, Munch):
     }
 
     def __init__(self, resources, **kwargs):
-        Munch.__init__(self, from_dict=self._defaults)
-
-        if not resources:
-            raise Exception('[Sub]resources are not set')
+        if not resources or not isinstance(resources, list):
+            raise Exception('List of [sub]resources is not set')
 
         if 'is_dynamic' in kwargs:
             for idx in range(len(resources)):
@@ -29,7 +27,8 @@ class MultiResource(ResourceCoresMixin, Munch):
             del kwargs['is_dynamic']
 
         kwargs['resources'] = resources
-        self.update(kwargs)
+
+        Munch.__init__(self, from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('multiresource')

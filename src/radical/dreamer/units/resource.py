@@ -67,24 +67,21 @@ class Resource(ResourceCoresMixin, Munch):
     _defaults = {
         'uid': '',
         'io_rate': 0.,
-        'is_dynamic': False
+        'is_dynamic': False,
+        'cores': {}
     }
 
     def __init__(self, **kwargs):
-        Munch.__init__(self, from_dict=self._defaults)
-
         if 'num_cores' in kwargs:
             kwargs.setdefault('perf_dist', {})['size'] = kwargs['num_cores']
             del kwargs['num_cores']
 
-        if kwargs:
-            self.update(kwargs)
+        Munch.__init__(self, from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('resource')
 
         if not self.cores:
-            self.cores = {}
             for p in self.perf_dist.samples:
                 core = Core(perf=abs(p), io_rate=self.io_rate)
                 self.cores[core.uid] = core

@@ -1,8 +1,7 @@
 
-import json
 import socket
 
-from radical.utils import Munch
+from radical.utils import read_json, Munch
 
 try:
     import getpass
@@ -75,10 +74,7 @@ class Config(Munch):
     }
 
     def __init__(self, from_dict=None, cfg_path=None):
-        super().__init__(from_dict=self._defaults)
+        if not from_dict and cfg_path:
+            from_dict = read_json(cfg_path)
 
-        if from_dict:
-            self.update(from_dict)
-        elif cfg_path:
-            with open(cfg_path) as f:
-                self.update(json.loads(f.read()))
+        super().__init__(from_dict=from_dict)

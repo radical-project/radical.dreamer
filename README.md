@@ -60,6 +60,8 @@ descriptions
 ```shell script
 # firstly activate corresponding virtualenv
 wget -q https://raw.githubusercontent.com/radical-project/radical.dreamer/master/examples/run_session.py
+# (!) for devel branch:
+# wget -q https://raw.githubusercontent.com/radical-project/radical.dreamer/devel/examples/run_session.py
 chmod +x run_session.py
 ./run_session.py
 ```

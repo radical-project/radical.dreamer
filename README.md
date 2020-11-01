@@ -3,7 +3,7 @@
 ## Requirements
 
 * Python 3.6+ with the following libraries:
-  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5.4+
+  * [radical.utils](https://github.com/radical-cybertools/radical.utils) 1.5.7+
   * numpy
   * pika
 * RabbitMQ (**running** instance that is installed either locally or remotely)
@@ -24,6 +24,11 @@ conda activate dreamer
 2) `radical.dreamer` package
 ```shell script
 pip install git+https://github.com/radical-project/radical.dreamer.git
+```
+NOTE: For test purposes to have the latest (**unstable**) version please use 
+the `devel` branch
+```shell script
+pip install git+https://github.com/radical-project/radical.dreamer.git@devel
 ```
 
 ## Executing of provided example
@@ -69,9 +74,12 @@ cfg_data = {
         'url': 'amqp://localhost:5672/'
     },
     'session': {
-        'output_profile': './profile.json',
-        'schedule_options': ['smallest_to_fastest'],
-        'early_binding': True
+        'profile_base_name': 'rd.profile'
+    },
+    'schedule': {
+        'strategy': 'smallest_to_fastest',
+        'early_binding': True,
+        'is_adaptive': False
     }
 }
 session = Session(cfg=Config(cfg_data))

@@ -3,6 +3,15 @@ import socket
 
 from radical.utils import read_json, Munch
 
+from ..utils import EnumTypes
+
+BINDING_TYPE = EnumTypes(
+    ('Early', 'early'),
+    ('Late', 'late'),
+    ('Dynamic', 'dynamic'),  # full knowledge about resource and workload
+    ('None', 'none')         # zero-knowledge about resource and workload
+)
+
 try:
     import getpass
 except ImportError:
@@ -15,9 +24,10 @@ UNIQ_ID = '%s.%s' % ('nouser' if getpass is None else getpass.getuser(),
                      socket.gethostname())
 
 
-class _RMQQueues(Munch):
+class RMQQueueNames(Munch):
     _schema = {
         'allocation': str,
+        'profile': str,
         'request': str,
         'resource': str,
         'schedule': str,
@@ -26,19 +36,25 @@ class _RMQQueues(Munch):
     }
 
 
-class _RMQConfig(Munch):
+class RMQConfig(Munch):
     _schema = {
         'url': str,
         'exchange': str,
-        'queues': _RMQQueues
+        'queues': RMQQueueNames
     }
 
 
-class _SessionConfig(Munch):
+class SessionConfig(Munch):
     _schema = {
-        'output_profile': str,
-        'schedule_options': list,
-        'early_binding': bool
+        'profile_base_name': str
+    }
+
+
+class ScheduleConfig(Munch):
+    _schema = {
+        'strategy': str,
+        'early_binding': bool,
+        'is_adaptive': bool
     }
 
 
@@ -49,8 +65,9 @@ class Config(Munch):
     """
 
     _schema = {
-        'rabbitmq': _RMQConfig,
-        'session': _SessionConfig
+        'rabbitmq': RMQConfig,
+        'session': SessionConfig,
+        'schedule': ScheduleConfig
     }
 
     _defaults = {
@@ -59,6 +76,7 @@ class Config(Munch):
             'exchange': 'rd.%s' % UNIQ_ID,  # RMQ exchange
             'queues': {                     # RMQ queues/routing_keys
                 'allocation': 'rd.allocation.%s' % UNIQ_ID,
+                'profile': 'rd.profile.%s' % UNIQ_ID,
                 'request': 'rd.request.%s' % UNIQ_ID,
                 'resource': 'rd.resource.%s' % UNIQ_ID,
                 'schedule': 'rd.schedule.%s' % UNIQ_ID,
@@ -67,9 +85,12 @@ class Config(Munch):
             }
         },
         'session': {
-            'output_profile': 'profile.json',
-            'schedule_options': [],
-            'early_binding': True
+            'profile_base_name': 'rd.profile'
+        },
+        'schedule': {
+            'strategy': '',
+            'early_binding': True,
+            'is_adaptive': False
         }
     }
 

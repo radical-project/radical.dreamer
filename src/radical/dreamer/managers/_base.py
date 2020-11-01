@@ -25,12 +25,44 @@ class Manager:
             raise Exception('Configuration is not set')
         elif not cfg and cfg_path:
             cfg = Config(cfg_path=cfg_path)
-        self._logger.info('Configuration is set')
+        self._cfg_setup(cfg)
+        self._logger.info('%s configuration is set' %
+                          self._NAME.title().replace('_', ''))
 
-        self._cfg = cfg.session
         self._rmq_queues = cfg.rabbitmq.queues
-
         self._rmq = RabbitMQ(
             url=os.environ.get('RADICAL_DREAMER_RMQ_URL') or cfg.rabbitmq.url,
             exchange=cfg.rabbitmq.exchange,
             queues=cfg.rabbitmq.queues)
+
+    def _cfg_setup(self, cfg):
+        pass
+
+
+class ManagerRunMixin:
+
+    def run(self):
+        obj_name = self._NAME.title().replace('_', '')
+
+        print('[INFO] Do not close until all sessions are processed\n'
+              '[INFO] %s running...' % obj_name)
+
+        try:
+            with self._rmq:
+
+                # method should be overwritten
+                self._run()
+
+        except KeyboardInterrupt:
+            self._logger.info('%s terminated' % obj_name)
+
+        except Exception as e:
+            self._logger.exception('%s failed: %s' % (obj_name, e))
+
+        finally:
+            print('\n[INFO] %s stopped' % obj_name)
+            with self._rmq:
+                self._rmq.delete()
+
+    def _run(self):
+        pass

@@ -44,10 +44,11 @@ if __name__ == '__main__':
                         ops_dist={'name': 'uniform',
                                   'mean': 1024.})
 
-    # Create a Session to publish descriptions of Resource and Workload to RMQ
+    # Create Session and set descriptions of Resource and Workload(s)
     session = Session(cfg=cfg_default)
-    session.set_resource(resource)
-    session.set_workload(workload)
+    session.set(resource=resource, workload=workload)
+    # Publish objects to RMQ and collect output profiles
+    session.run()
 
 """
 ### Config example:
@@ -59,9 +60,12 @@ cfg_data = {
         'url': 'amqp://localhost:5672/'
     },
     'session': {
-        'output_profile': './profile.json',
-        'schedule_options': ['smallest_to_fastest'],
-        'early_binding': True
+        'profile_base_name': './rd.profile'
+    },
+    'schedule': {
+        'strategy': 'smallest_to_fastest',
+        'early_binding': True,
+        'is_adaptive': False
     }
 }
 session = Session(cfg=Config(cfg_data))

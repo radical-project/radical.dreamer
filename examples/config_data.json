@@ -3,8 +3,11 @@
         "url": "amqp://localhost:5672/"
     },
     "session": {
-        "output_profile": "./profile.json",
-        "schedule_options": ["smallest_to_fastest"],
-        "early_binding": true
+        "profile_base_name": "./rd.profile"
+    },
+    "schedule": {
+        "strategy": "smallest_to_fastest",
+        "early_binding": true,
+        "is_adaptive": false
     }
 }

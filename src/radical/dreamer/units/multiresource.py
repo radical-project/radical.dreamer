@@ -4,7 +4,7 @@ from radical.utils import generate_id, Munch
 from .resource import Resource, ResourceCoresMixin
 
 
-class MultiResource(ResourceCoresMixin, Munch):
+class MultiResource(Munch, ResourceCoresMixin):
 
     _schema = {
         'uid': str,
@@ -36,14 +36,6 @@ class MultiResource(ResourceCoresMixin, Munch):
         for idx in range(len(self.resources)):
             self.resources[idx] = Resource(**self.resources[idx])
             self.cores.update(self.resources[idx].cores)
-
-    def as_dict(self):
-        output = super().as_dict()
-        for idx in range(len(output['resources'])):
-            output['resources'][idx] = output['resources'][idx].as_dict()
-            for uid in output['resources'][idx]['cores']:
-                output['cores'][uid] = output['resources'][idx]['cores'][uid]
-        return output
 
     def dynamic_consistency_adjustment(self):
         """

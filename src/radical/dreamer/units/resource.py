@@ -1,6 +1,4 @@
 
-import random
-
 from radical.utils import generate_id, Munch
 
 from .core import Core
@@ -13,48 +11,19 @@ class ResourceCoresMixin:
     def num_cores(self):
         return len(self.cores)
 
-    @staticmethod
-    def reorder_cores(cores, reverse=None):
-        """
-        Reorder cores according to the mode (input parameter will be changed).
+    def process(self, tasks):
+        for task in tasks:
+            if task.core_uid and task.core_uid in self.cores:
+                # TODO: is warning or exception needed in case of not bound task
+                self.cores[task.core_uid].run(task)
 
-        :param cores: Core objects.
-        :type cores: list
-        :param reverse: Sorting direction (reverse=True -> fastest_first).
-        :type reverse: bool/None
-        """
-        if reverse is not None:
-            cores.sort(key=lambda c: c.perf, reverse=reverse)
-
-    def get_cores(self, num=None, order_reverse=None, prior_sort=False):
-        """
-        Get all [or subset] of cores that are of a certain order (if no
-        conditions are set then all cores of a random order will be returned).
-
-        :param num: Number of returned cores, if None then return all cores.
-        :type num: int/None
-        :param order_reverse: Sorting direction.
-        :type order_reverse: bool/None
-        :param prior_sort: Flag to pick prior sorted cores (late-binding).
-        :type prior_sort: bool
-        :return: Core objects.
-        :rtype: list
-        """
-        output = list(self.cores.values())
-        if ((num and num < self.num_cores and not prior_sort) or
-                order_reverse is None):
-            random.shuffle(output)
-            output = output[:num]
-
-        self.reorder_cores(output, order_reverse)
-
-        if num and prior_sort and order_reverse is not None:
-            output = output[:num]
-
-        return output
+    def release_cores(self, cores=None):
+        cores = cores or self.cores.values()
+        for core in sorted(cores, key=lambda c: (c.release_time, c.uid)):
+            yield core
 
 
-class Resource(ResourceCoresMixin, Munch):
+class Resource(Munch, ResourceCoresMixin):
 
     _schema = {
         'uid': str,
@@ -88,12 +57,6 @@ class Resource(ResourceCoresMixin, Munch):
         else:
             for uid in self.cores:
                 self.cores[uid] = Core(**self.cores[uid])
-
-    def as_dict(self):
-        output = super().as_dict()
-        for uid in output['cores']:
-            output['cores'][uid] = output['cores'][uid].as_dict()
-        return output
 
     def dynamic_consistency_adjustment(self):
         """

@@ -32,7 +32,7 @@ if sys.hexversion < 0x03060000:
 setup_args = {
     'name': _PKG_NAME,
     'namespace_packages': ['radical'],
-    'version': '0.1.2',
+    'version': '0.2.0',
     'description': 'Dynamic REsource and Adaptive Mapping EmulatoR',
     # 'long_description' : (read('README.md') + '\n\n' + read('CHANGES.md')),
     'author': __author__,
@@ -62,7 +62,7 @@ setup_args = {
     'packages': find_namespace_packages('src', include=['radical.*']),
     'package_dir': {'': 'src'},
     'package_data': {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
-    'install_requires': ['radical.utils>=1.5.4',
+    'install_requires': ['radical.utils>=1.5.7',
                          'numpy',
                          'pika'],
     'tests_require': ['pytest',

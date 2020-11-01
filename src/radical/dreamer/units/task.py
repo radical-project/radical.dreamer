@@ -9,7 +9,7 @@ class Task(Munch):
         'ops': float,
         'start_time': float,
         'end_time': float,
-        'exec_core_id': str
+        'core_uid': str
     }
 
     _defaults = {
@@ -17,7 +17,7 @@ class Task(Munch):
         'ops': 1.,
         'start_time': 0.,
         'end_time': 0.,
-        'exec_core_id': ''
+        'core_uid': ''
     }
 
     def __init__(self, **kwargs):

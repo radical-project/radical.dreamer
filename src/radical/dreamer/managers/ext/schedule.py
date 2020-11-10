@@ -71,7 +71,7 @@ class Schedule:
                                     'smallest_to_slowest']:
             order_reverse = False
         else:
-            # no strategy (round robin) or random strategy
+            # no strategy (FIFO) or random strategy
             order_reverse = None
 
         cores = list(resource.cores.values())
@@ -114,7 +114,7 @@ class Schedule:
                                     'smallest_to_slowest']:
             order_reverse = False
         else:
-            # no strategy (round robin) or random strategy
+            # no strategy (FIFO) or random strategy
             order_reverse = None
 
         tasks = list(workload.tasks.values())

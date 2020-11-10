@@ -3,7 +3,7 @@
 # RADICAL-DREAMER (RD) is a successor of WLMS-Emulator (aka RADICAL-Calculator),
 # it is a renewed implementation of the original concept.
 #
-# [ DREAMER: Dynamic REsource and Adaptive Mapping EmulatoR ]
+# [ DREAMER: Dynamic RuntimE and Adaptive Middleware EmulatoR ]
 #
 
 __author__    = 'RADICAL-Cybertools Team'
@@ -33,7 +33,7 @@ setup_args = {
     'name': _PKG_NAME,
     'namespace_packages': ['radical'],
     'version': '0.2.0',
-    'description': 'Dynamic REsource and Adaptive Mapping EmulatoR',
+    'description': 'Dynamic RuntimE and Adaptive Middleware EmulatoR',
     # 'long_description' : (read('README.md') + '\n\n' + read('CHANGES.md')),
     'author': __author__,
     'author_email': __email__,

@@ -64,18 +64,23 @@ class Schedule:
         prior_sort = False if self._cfg.early_binding else True
 
         # strategy uses knowledge about resource/cores to rearrange cores
-        order_reverse = None
         if self._cfg.strategy in ['largest_to_fastest',
                                   'smallest_to_fastest']:
             order_reverse = True
         elif self._cfg.strategy in ['largest_to_slowest',
                                     'smallest_to_slowest']:
             order_reverse = False
+        else:
+            # no strategy (round robin) or random strategy
+            order_reverse = None
 
         cores = list(resource.cores.values())
         if ((num_cores and num_cores < resource.num_cores and not prior_sort) or
                 order_reverse is None):
-            random.shuffle(cores)
+
+            if self._cfg.strategy == 'random':
+                random.shuffle(cores)
+
             cores = cores[:num_cores]
 
         if order_reverse is not None:
@@ -102,18 +107,23 @@ class Schedule:
         prior_sort = True if self._cfg.early_binding else False
 
         # strategy uses knowledge about workload/tasks to rearrange tasks
-        order_reverse = None
         if self._cfg.strategy in ['largest_to_fastest',
                                   'largest_to_slowest']:
             order_reverse = True
         elif self._cfg.strategy in ['smallest_to_fastest',
                                     'smallest_to_slowest']:
             order_reverse = False
+        else:
+            # no strategy (round robin) or random strategy
+            order_reverse = None
 
         tasks = list(workload.tasks.values())
         if ((group_size and group_size < workload.num_tasks and
                 not prior_sort) or order_reverse is None):
-            random.shuffle(tasks)
+
+            if self._cfg.strategy == 'random':
+                random.shuffle(tasks)
+
             groups = split_to_groups(tasks, group_size)
         else:
             groups = [tasks]

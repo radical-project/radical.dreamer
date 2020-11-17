@@ -1,4 +1,4 @@
-# RADICAL-DREAMER: Dynamic RuntimE and Adaptive Middleware EmulatoR
+# RADICAL-DREAMER: Dynamic Runtime and Execution Adaptive Middleware EmulatoR
 
 ## Requirements
 

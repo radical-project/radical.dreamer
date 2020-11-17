@@ -4,7 +4,7 @@ from radical.utils import generate_id, Munch
 from .resource import Resource, ResourceCoresMixin
 
 
-class MultiResource(Munch, ResourceCoresMixin):
+class MultiResource(ResourceCoresMixin, Munch):
 
     _schema = {
         'uid': str,
@@ -28,7 +28,7 @@ class MultiResource(Munch, ResourceCoresMixin):
 
         kwargs['resources'] = resources
 
-        Munch.__init__(self, from_dict=kwargs)
+        super().__init__(from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('multiresource')

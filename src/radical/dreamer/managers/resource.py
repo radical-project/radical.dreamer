@@ -73,7 +73,7 @@ class ResourceManager(Manager, ManagerRunMixin):
                         data=Task.demunch(tasks))
 
                     # TODO: for strategies based on cores availability
-                    #   `for core in self._resource.release_cores():...`
+                    #   `for cores in self._resource.released_cores:...`
 
                     # after all allocated cores process another group of
                     # tasks check resource dynamism (re-generate cores

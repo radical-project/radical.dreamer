@@ -7,6 +7,10 @@ from .ext import SampleDistribution
 
 class ResourceCoresMixin:
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._busy_cores = []
+
     @property
     def num_cores(self):
         return len(self.cores)
@@ -14,16 +18,27 @@ class ResourceCoresMixin:
     def process(self, tasks):
         for task in tasks:
             if task.core_uid and task.core_uid in self.cores:
-                # TODO: is warning or exception needed in case of not bound task
+                # TODO: exception in case of not bound task?
+                # TODO: exception in case of core is already in a busy list?
                 self.cores[task.core_uid].run(task)
+                self._busy_cores.append(self.cores[task.core_uid])
+        self._busy_cores.sort(key=lambda c: c.release_time)
 
-    def release_cores(self, cores=None):
-        cores = cores or self.cores.values()
-        for core in sorted(cores, key=lambda c: (c.release_time, c.uid)):
-            yield core
+    @property
+    def planned_release_times(self):
+        return {c.uid: c.planned_release_time for c in self._busy_cores}
+
+    @property
+    def released_cores(self):
+        if self._busy_cores:
+            cores = []
+            release_time = self._busy_cores[0].release_time
+            while release_time == self._busy_cores[0].release_time:
+                cores.append(self._busy_cores.pop(0))
+            yield cores
 
 
-class Resource(Munch, ResourceCoresMixin):
+class Resource(ResourceCoresMixin, Munch):
 
     _schema = {
         'uid': str,
@@ -45,7 +60,7 @@ class Resource(Munch, ResourceCoresMixin):
             kwargs.setdefault('perf_dist', {})['size'] = kwargs['num_cores']
             del kwargs['num_cores']
 
-        Munch.__init__(self, from_dict=kwargs)
+        super().__init__(from_dict=kwargs)
 
         if not self.uid:
             self.uid = generate_id('resource')

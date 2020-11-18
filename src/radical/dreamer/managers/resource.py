@@ -75,10 +75,6 @@ class ResourceManager(Manager, ManagerRunMixin):
                     # TODO: for strategies based on cores availability
                     #   `for cores in self._resource.released_cores:...`
 
-                    # after all allocated cores process another group of
-                    # tasks check resource dynamism (re-generate cores
-                    # performance if resource is dynamic)
-                    self._resource.dynamic_consistency_adjustment()
                     # re-binding of tasks to cores
                     self._schedule.adaptive_binding(resource=self._resource,
                                                     num_cores=num_cores)

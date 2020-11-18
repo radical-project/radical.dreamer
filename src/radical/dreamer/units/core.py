@@ -7,17 +7,19 @@ class Core(Munch):
     _schema = {
         'uid': str,
         'perf': float,
+        'perf_dynamic': float,
         'io_rate': float,
-        'task_exec_times': list,
-        'task_uids': list
+        'planned_release_time': float,
+        'release_time': float
     }
 
     _defaults = {
         'uid': '',
         'perf': 1.,
+        'perf_dynamic': 1.,
         'io_rate': 0.,
-        'task_exec_times': [],
-        'task_uids': []
+        'planned_release_time': 0.,
+        'release_time': 0.
     }
 
     def __init__(self, **kwargs):
@@ -32,19 +34,19 @@ class Core(Munch):
         #     raise Exception('Task %s is not bound to Core %s' %
         #                     (task.uid, self.uid))
 
-        if self.task_exec_times:
-            task.start_time = self.task_exec_times[-1][1]
-        task.end_time = task.start_time + (task.ops / self.perf)
+        # get core release time (from the previous task)
+        task.start_time = self.release_time
+
+        self.planned_release_time = task.start_time + (task.ops / self.perf)
+        self.release_time += task.ops / self.perf_dynamic
 
         if self.io_rate:
-            task.end_time += task.ops / self.io_rate
+            io_task_duration = task.ops / self.io_rate
+            self.planned_release_time += io_task_duration
+            self.release_time += io_task_duration
 
-        self.task_exec_times.append((task.start_time, task.end_time))
-        self.task_uids.append(task.uid)
-
-    @property
-    def release_time(self):
-        return 0. if not self.task_exec_times else self.task_exec_times[-1][1]
+        # actual release time for the current task (dynamic performance)
+        task.end_time = self.release_time
 
     # def is_busy(self, timestamp):
     #     # TODO: check exact time when is core considered as available/idle

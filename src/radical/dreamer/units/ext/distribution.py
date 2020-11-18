@@ -17,63 +17,63 @@ class SampleDistribution(Munch):
     _schema = {
         'name': str,
         'mean': float,
-        'var': float,
-        'var_local': float,
+        'var_spatial': float,
+        'var_temporal': float,
         'size': int
     }
 
     _defaults = {
         'name': NAMES.Uniform,
         'mean': 1.,
-        'var': 0.,
-        'var_local': 0.,
+        'var_spatial': 0.,
+        'var_temporal': 0.,
         'size': 1
     }
 
     @property
     def samples(self):
-        if self.name not in self.NAMES.values:
+        if not self.var_spatial:
+            output = [self.mean] * self.size
+
+        elif self.name not in self.NAMES.values:
             raise ValueError('Possible distributions are following: %s' %
                              ', '.join(self.NAMES.values))
 
-        output = []
+        else:
+            output = []
+            if self.name == self.NAMES.Uniform:
+                output = list(np.random.uniform(self.mean - self.var_spatial,
+                                                self.mean + self.var_spatial,
+                                                self.size))
 
-        if self.name == self.NAMES.Uniform:
+            elif self.name == self.NAMES.Normal:
+                output = list(np.random.normal(self.mean,
+                                               self.var_spatial,
+                                               self.size))
 
-            # distribution among all elements
-            output = list(np.random.uniform(self.mean - self.var,
-                                            self.mean + self.var,
-                                            self.size))
-            # distribution of each element (local distribution)
-            if self.var_local:
-                for i in range(self.size):
-                    output[i] = np.random.uniform(output[i] - self.var_local,
-                                                  output[i] + self.var_local)
-
-        elif self.name == self.NAMES.Normal:
-
-            # distribution among all elements
-            output = list(np.random.normal(self.mean, self.var, self.size))
-            # distribution of each element (local distribution)
-            if self.var_local:
-                for i in range(self.size):
-                    output[i] = np.random.normal(output[i], self.var_local)
-
-        elif self.name == self.NAMES.Poisson:
-
-            if self.var:  # used as a flag to generate samples
-                # distribution among all elements
+            elif self.name == self.NAMES.Poisson:
                 output = list(np.random.poisson(self.mean, self.size))
                 # convert <class 'numpy.int64'> into <class 'float'>
                 # (numpy types are not JSON serializable)
                 for i in range(self.size):
                     output[i] = float(output[i])
-            else:
-                output = [self.mean] * self.size
 
-            if self.var_local:  # used as a flag to generate samples
-                # distribution of each element (local distribution)
-                for i in range(self.size):
-                    output[i] = float(np.random.poisson(output[i]))
+        return output
+
+    def sample_temporal(self, mean):
+        output = mean
+        if self.var_temporal:
+
+            if self.name == self.NAMES.Uniform:
+                output = np.random.uniform(mean - self.var_temporal,
+                                           mean + self.var_temporal)
+
+            elif self.name == self.NAMES.Normal:
+                output = np.random.normal(mean, self.var_temporal)
+
+            elif self.name == self.NAMES.Poisson:
+                # convert <class 'numpy.int64'> into <class 'float'>
+                # (numpy types are not JSON serializable)
+                output = float(np.random.poisson(mean))
 
         return output

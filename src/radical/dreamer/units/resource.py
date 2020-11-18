@@ -18,6 +18,7 @@ class ResourceCoresMixin:
     def process(self, tasks):
         for task in tasks:
             if task.core_uid and task.core_uid in self.cores:
+                self.set_dynamic_performance(task.core_uid)
                 # TODO: exception in case of not bound task?
                 # TODO: exception in case of core is already in a busy list?
                 self.cores[task.core_uid].run(task)
@@ -43,7 +44,6 @@ class Resource(ResourceCoresMixin, Munch):
     _schema = {
         'uid': str,
         'io_rate': float,
-        'is_dynamic': bool,
         'cores': dict,
         'perf_dist': SampleDistribution
     }
@@ -51,7 +51,6 @@ class Resource(ResourceCoresMixin, Munch):
     _defaults = {
         'uid': '',
         'io_rate': 0.,
-        'is_dynamic': False,
         'cores': {}
     }
 
@@ -73,11 +72,13 @@ class Resource(ResourceCoresMixin, Munch):
             for uid in self.cores:
                 self.cores[uid] = Core(**self.cores[uid])
 
-    def dynamic_consistency_adjustment(self):
+    def set_dynamic_performance(self, core_uid):
         """
-        If resource is dynamic, then re-generate cores performance.
+        Re-generate dynamic core performance (if resource is dynamic).
+
+        @param core_uid: Core uid.
+        @type core_uid: str
         """
-        if self.is_dynamic:
-            perf_values = self.perf_dist.samples
-            for idx, core in enumerate(self.cores.values()):
-                core.perf = abs(perf_values[idx])
+        if core_uid in self.cores:
+            core = self.cores[core_uid]
+            core.perf_dynamic = self.perf_dist.sample_temporal(mean=core.perf)

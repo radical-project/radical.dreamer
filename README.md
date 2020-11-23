@@ -102,7 +102,7 @@ session_1 = Session(cfg_path='./config_data.json')
 session_2 = Session(cfg=Config(cfg_path='./config_data.json'))
 ```
 
-## Examples of Resource and Workflow definition
+## Examples of Resource and Workload definition
 The following examples of values distributions are applied for both, `Resource` 
 and `Workload`, the same way. More important is the meaning, which user put into
 these descriptions.

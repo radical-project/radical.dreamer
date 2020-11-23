@@ -139,10 +139,7 @@ resource = Resource(num_cores=36,
                                'var_spatial': 4.,
                                'var_temporal': 2.})
 ```
-NOTE: For `poisson` distribution, parameters `var_spatial` and `var_temporal` 
-are used as flags only, their actual values are not taken into account (
-`var_spatial=1. -> True`, `var_temporal=1. -> True`)
-4) Multiple resources or resource with multiple distributions (`total number: 
+5) Multiple resources or resource with multiple distributions (`total number: 
 25, 20 heterogeneous dynamic cores with normal distr and 5 homogeneous cores`)
 ```python
 resource = MultiResource(resources=[{'num_cores': 20,
@@ -153,9 +150,14 @@ resource = MultiResource(resources=[{'num_cores': 20,
                                     {'num_cores': 5,
                                      'perf_dist': {'mean': 10.}}])
 ```
-5) Additional parameter(s) for resource definition
+6) Additional parameter(s) for resource definition
  - `io_rate` (`float`) - I/O abstraction to add time for task spent on I/O
   processes (assume that I/O includes data transfers and network throughput)
+
+NOTE: There are 3 types of distributions used: `uniform`, `normal` and
+`poisson`. For `poisson` distribution, parameters `var_spatial` and 
+`var_temporal` are used as flags only, their actual values are not taken into 
+account (`var_spatial=1. -> True`, `var_temporal=1. -> True`)
 
 ### Workload
 1) Homogeneous tasks (`number: 128, ops: 10.`)

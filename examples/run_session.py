@@ -31,18 +31,16 @@ from radical.dreamer.configs import cfg_default
 if __name__ == '__main__':
     # Create a Resource with a specific number of cores,
     # with performance of each core drawn from a distribution
-    # (provided resource is dynamic)
+    # (provided resource is dynamic due to `var_temporal` input data)
     resource = Resource(num_cores=128,
                         perf_dist={'name': 'uniform',
                                    'mean': 32.,
-                                   'var': 2.,
-                                   'var_local': 1.},
-                        is_dynamic=True)
+                                   'var_spatial': 2.,
+                                   'var_temporal': 1.})
     # Create a Workload with a specific number of tasks,
     # with number of operations per task drawn from a distribution
     workload = Workload(num_tasks=128,
-                        ops_dist={'name': 'uniform',
-                                  'mean': 1024.})
+                        ops_dist={'mean': 1024.})
 
     # Create Session and set descriptions of Resource and Workload(s)
     session = Session(cfg=cfg_default)

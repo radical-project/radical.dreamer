@@ -8,7 +8,7 @@ __license__   = 'MIT'
 import argparse
 import sys
 
-from radical.dreamer import ResourceManager, WorkloadManager
+from radical.dreamer import ResourceManager
 
 
 def get_args():
@@ -20,14 +20,7 @@ def get_args():
     """
     parser = argparse.ArgumentParser(
         description='Run the manager for RADICAL-DREAMER.',
-        usage='radical-dreamer-start-manager '
-              '<manager_name> [--cfg_path <config_file>]')
-
-    parser.add_argument(
-        'manager_name',
-        type=str,
-        choices=['resource', 'workload'],
-        help='manager name')
+        usage='radical-dreamer-start-manager [--cfg_path <config_file>]')
 
     parser.add_argument(
         '--cfg_path',
@@ -46,9 +39,6 @@ def proceed(args):
     :param args: Arguments.
     :type args: _AttributeHolder
     """
-    manager_cls = {'resource': ResourceManager,
-                   'workload': WorkloadManager}[args.manager_name]
-
     if args.cfg_path:
         options = {'cfg_path': args.cfg_path}
     else:
@@ -58,7 +48,7 @@ def proceed(args):
             cfg_default = None
         options = {'cfg': cfg_default}
 
-    m = manager_cls(**options)
+    m = ResourceManager(**options)
     m.run()
 
 

@@ -8,8 +8,8 @@ from ..utils import EnumTypes
 BINDING_TYPE = EnumTypes(
     ('Early', 'early'),
     ('Late', 'late'),
-    ('Dynamic', 'dynamic'),  # full knowledge about resource and workload
-    ('None', 'none')         # zero-knowledge about resource and workload
+    ('Adaptive', 'adaptive'),
+    ('None', 'none')
 )
 
 try:
@@ -26,11 +26,8 @@ UNIQ_ID = '%s.%s' % ('nouser' if getpass is None else getpass.getuser(),
 
 class RMQQueueNames(Munch):
     _schema = {
-        'allocation': str,
         'profile': str,
-        'request': str,
         'resource': str,
-        'schedule': str,
         'session': str,
         'workload': str
     }
@@ -44,17 +41,17 @@ class RMQConfig(Munch):
     }
 
 
-class SessionConfig(Munch):
-    _schema = {
-        'profile_base_name': str
-    }
-
-
 class ScheduleConfig(Munch):
     _schema = {
         'strategy': str,
         'early_binding': bool,
         'is_adaptive': bool
+    }
+
+
+class SessionConfig(Munch):
+    _schema = {
+        'profile_base_name': str
     }
 
 
@@ -66,8 +63,8 @@ class Config(Munch):
 
     _schema = {
         'rabbitmq': RMQConfig,
-        'session': SessionConfig,
-        'schedule': ScheduleConfig
+        'schedule': ScheduleConfig,
+        'session': SessionConfig
     }
 
     _defaults = {
@@ -75,22 +72,19 @@ class Config(Munch):
             'url': 'amqp://localhost:5672/',
             'exchange': 'rd.%s' % UNIQ_ID,  # RMQ exchange
             'queues': {                     # RMQ queues/routing_keys
-                'allocation': 'rd.allocation.%s' % UNIQ_ID,
                 'profile': 'rd.profile.%s' % UNIQ_ID,
-                'request': 'rd.request.%s' % UNIQ_ID,
                 'resource': 'rd.resource.%s' % UNIQ_ID,
-                'schedule': 'rd.schedule.%s' % UNIQ_ID,
                 'session': 'rd.session.%s' % UNIQ_ID,
                 'workload': 'rd.workload.%s' % UNIQ_ID
             }
-        },
-        'session': {
-            'profile_base_name': 'rd.profile'
         },
         'schedule': {
             'strategy': '',
             'early_binding': True,
             'is_adaptive': False
+        },
+        'session': {
+            'profile_base_name': 'rd.profile'
         }
     }
 

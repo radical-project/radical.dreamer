@@ -1,13 +1,7 @@
 
-import itertools
 import random
 
 from ...configs import ScheduleConfig
-
-
-def split_to_groups(data, size=None):
-    size = size or len(data)
-    return [data[i:i + size] for i in range(0, len(data), size)]
 
 
 class Schedule:
@@ -17,53 +11,21 @@ class Schedule:
             raise Exception('Config not valid')
 
         self._cfg = cfg or ScheduleConfig()
-        self._groups = []
-        self._next_group_idx = 0
+        self._tasks = []
 
     @property
-    def layout(self):
-        return self._groups[:]
+    def is_active(self):
+        return bool(self._tasks)
 
-    @layout.setter
-    def layout(self, value):
-        self._groups = list(value)
-        self._next_group_idx = 0
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        output = self.next()
-        if output is None:
-            raise StopIteration
-        return output
-
-    def next(self):
-        if self._next_group_idx < len(self._groups):
-            output = self._groups[self._next_group_idx]
-            self._next_group_idx += 1
-        else:
-            output = None
-        return output
-
-    def get_cores_filtered(self, resource, num_cores, uid_only=False):
+    def reorder_cores(self, cores):
         """
-        Get all [or subset] of cores that are of a certain order (if no
-        conditions are set then all cores of a random order will be returned).
+        Re-order cores according to the defined strategy.
 
-        :param resource: Resource object.
-        :type resource: radical.dreamer.units.(multi)resource.(Multi)Resource
-        :param num_cores: Number of cores, if None then return all cores.
-        :type num_cores: int/None
-        :param uid_only: Flag to return only core uids.
-        :type uid_only: bool
-        :return: Cores (dicts or uids).
+        :param cores: Core objects (radical.dreamer.units.core.Core).
+        :type cores: list
+        :return: Reordered Core objects (radical.dreamer.units.core.Core).
         :rtype: list
         """
-        # binding type defines availability of knowledge about resource/cores
-        prior_sort = False if self._cfg.early_binding else True
-
-        # strategy uses knowledge about resource/cores to rearrange cores
         if self._cfg.strategy in ['largest_to_fastest',
                                   'smallest_to_fastest']:
             order_reverse = True
@@ -71,42 +33,26 @@ class Schedule:
                                     'smallest_to_slowest']:
             order_reverse = False
         else:
-            # no strategy (FIFO) or random strategy
+            # random strategy or FIFO (a.k.a. no strategy)
             order_reverse = None
 
-        cores = list(resource.cores.values())
-        if ((num_cores and num_cores < resource.num_cores and not prior_sort) or
-                order_reverse is None):
-
+        if order_reverse is None:
             if self._cfg.strategy == 'random':
                 random.shuffle(cores)
-
-            cores = cores[:num_cores]
-
-        if order_reverse is not None:
+        else:
             cores.sort(key=lambda c: c.perf, reverse=order_reverse)
 
-            if num_cores and prior_sort:
-                cores = cores[:num_cores]
+        return cores
 
-        return [c.uid if uid_only else c.as_dict() for c in cores]
-
-    def get_tasks_grouped(self, workload, group_size):
+    def reorder_tasks(self, tasks):
         """
-        Get all [or subset] of grouped tasks that are of a certain order (if no
-        conditions are set then all tasks of a random order will be returned).
+        Re-order tasks according to the defined strategy.
 
-        :param workload: Workload object.
-        :type workload: radical.dreamer.units.workload.Workload
-        :param group_size: Number of tasks per group (to fit the resource).
-        :type group_size: int/None
-        :return: Groups of tasks (dict objects).
+        :param tasks: Task objects (radical.dreamer.units.task.Task).
+        :type tasks: list
+        :return: Reordered Task objects (radical.dreamer.units.task.Task).
         :rtype: list
         """
-        # binding type defines availability of knowledge about workload/tasks
-        prior_sort = True if self._cfg.early_binding else False
-
-        # strategy uses knowledge about workload/tasks to rearrange tasks
         if self._cfg.strategy in ['largest_to_fastest',
                                   'largest_to_slowest']:
             order_reverse = True
@@ -114,49 +60,62 @@ class Schedule:
                                     'smallest_to_slowest']:
             order_reverse = False
         else:
-            # no strategy (FIFO) or random strategy
+            # random strategy or FIFO (a.k.a. no strategy)
             order_reverse = None
 
-        tasks = list(workload.tasks.values())
-        if ((group_size and group_size < workload.num_tasks and
-                not prior_sort) or order_reverse is None):
-
+        if order_reverse is None:
             if self._cfg.strategy == 'random':
                 random.shuffle(tasks)
-
-            groups = split_to_groups(tasks, group_size)
         else:
-            groups = [tasks]
+            tasks.sort(key=lambda t: t.ops, reverse=order_reverse)
 
-        if order_reverse is not None:
-            for idx in range(len(groups)):
-                groups[idx].sort(key=lambda t: t.ops, reverse=order_reverse)
+        return tasks
 
-            if group_size and prior_sort:
-                groups = split_to_groups(groups[0], group_size)
+    def set_tasks(self, tasks):
+        self._tasks = self.reorder_tasks(tasks=tasks)
 
-        return [[task.as_dict() for task in group] for group in groups]
+    def get_scheduled_tasks(self, cores, **kwargs):
+        output = []
 
-    def binding(self, tasks_grouped, core_uids):
-        for group in tasks_grouped:
-            for idx in range(len(group)):
-                # assign core_uid to the corresponding task
-                group[idx]['core_uid'] = core_uids[idx]
-            self._groups.append(group)
+        num_tasks = len(self._tasks)
+        core_uids = [c.uid for c in self.reorder_cores(cores=cores)[:num_tasks]]
 
-    def rebinding(self, core_uids):
-        tasks = list(
-            itertools.chain.from_iterable(self._groups[self._next_group_idx:]))
-        del self._groups[self._next_group_idx:]
+        if self._cfg.early_binding:
 
-        # keep the same order of tasks
-        tasks_grouped = split_to_groups(tasks, len(core_uids))
-        self.binding(tasks_grouped, core_uids)
+            num_cores = len(core_uids)
 
-    def adaptive_binding(self, resource, num_cores):
-        if not self._cfg.early_binding or self._cfg.is_adaptive:
-            self.rebinding(
-                core_uids=self.get_cores_filtered(
-                    resource=resource,
-                    num_cores=num_cores,
-                    uid_only=True))
+            if not self._tasks[0].core_uid:
+
+                # initial binding for early-binding type
+                for idx, task in enumerate(self._tasks):
+                    task.core_uid = core_uids[idx % num_cores]
+
+                output.extend(self._tasks[:num_cores])
+                del self._tasks[:num_cores]
+
+            else:
+
+                idx = 0
+                while True:
+
+                    if self._tasks[idx].core_uid in core_uids:
+                        output.append(self._tasks.pop(idx))
+                    else:
+                        idx += 1
+
+                    if idx == len(self._tasks) or len(output) == num_cores:
+                        break
+
+        else:
+
+            # late-binding type
+            for core_uid in core_uids:
+                self._tasks[0].core_uid = core_uid
+                output.append(self._tasks.pop(0))
+
+            # TODO: adaptive-binding type
+            #       (additional data is in `kwargs`; input parameters will be
+            #       extended with such additional data as planned release time
+            #       per core and performance history per core)
+
+        return output

@@ -1,11 +1,11 @@
 
-from ..units import MultiResource, Resource, Task
+from ..units import MultiResource, Resource, Task, Workload
 
-from ._base import Manager, ManagerRunMixin
+from ._base import Manager
 from .ext import Schedule
 
 
-class ResourceManager(Manager, ManagerRunMixin):
+class ResourceManager(Manager):
 
     _NAME = Manager.NAMES.Resource
 
@@ -15,69 +15,80 @@ class ResourceManager(Manager, ManagerRunMixin):
             self._rmq.declare()
 
         self._resource = None
+        self._workload = None
 
     def _cfg_setup(self, cfg):
         self._schedule = Schedule(cfg=cfg.schedule)
 
     def _run(self):
-        workload_uid = None
-
         while True:
 
-            resource = self._rmq.get(self._rmq_queues.resource)
-            if resource:
-                if resource['uid'].startswith('multiresource'):
-                    self._resource = MultiResource(**resource)
-                else:
-                    self._resource = Resource(**resource)
-                self._logger.info('Resource (%s) received' % self._resource.uid)
+            # - keep it for later enhancements (e.g., config for Schedule) -
+            # session = self._rmq.get(self._rmq_queues.session)
+            # if session:
+            # - read session data (e.g., configs) -
 
-            session = self._rmq.get(self._rmq_queues.session)
-            if session:
-                workload_uid = session.get('workload_uid')
-                self._logger.info('Workload (%s) published' % workload_uid)
+            if self._resource is None:
+                resource = self._rmq.get(self._rmq_queues.resource)
+                if resource:
+                    if resource['uid'].startswith('multiresource'):
+                        self._resource = MultiResource(**resource)
+                    else:
+                        self._resource = Resource(**resource)
+                    self._logger.info('Resource (%s) received' %
+                                      self._resource.uid)
 
-            if self._resource and workload_uid:
+            if self._workload is None:
+                workload = self._rmq.get(self._rmq_queues.workload)
+                if workload:
+                    self._workload = Workload(**workload)
+                    self._logger.info('Workload (%s) received' %
+                                      self._workload.uid)
 
-                _data = None
-                while not _data:
-                    # get an allocation request from request-queue
-                    _data = self._rmq.get(self._rmq_queues.request)
-                num_cores = _data.get('num_cores')
+            # start to process
 
-                # publish allocated cores (uids) to allocation-queue
-                self._rmq.publish(
-                    queue=self._rmq_queues.allocation,
-                    data=self._schedule.get_cores_filtered(
-                        resource=self._resource,
-                        num_cores=num_cores,
-                        uid_only=True))
-                self._logger.info('List of allocated cores published')
+            if self._resource and self._workload:
 
-                schedule_layout = None
-                while not schedule_layout:
-                    # get scheduled tasks with cores from schedule-queue
-                    schedule_layout = self._rmq.get(self._rmq_queues.schedule)
-                self._schedule.layout = schedule_layout
-                self._logger.info('Preliminary schedule received')
+                self._schedule.set_tasks(self._workload.tasks_list)
 
-                for bound_tasks in self._schedule:
-                    tasks = [Task(**task) for task in bound_tasks]
+                for idle_cores in self._resource.idle_cores:
 
-                    # run tasks execution on assigned cores
+                    if not self._schedule.is_active:
+                        if not self._resource.is_busy:
+                            # exit processing (no new tasks, no busy cores)
+                            break
+                        else:
+                            # emulate cycle(s) to release last busy cores
+                            continue
+
+                    tasks = self._schedule.get_scheduled_tasks(idle_cores)
                     self._resource.process(tasks)
 
-                    # publish profile data back to session [manager]
+                    # publish profile data back to the session [manager]
                     self._rmq.publish(
                         queue=self._rmq_queues.profile,
                         data=Task.demunch(tasks))
 
-                    # TODO: for strategies based on cores availability
-                    #   `for cores in self._resource.released_cores:...`
-
-                    # re-binding of tasks to cores
-                    self._schedule.adaptive_binding(resource=self._resource,
-                                                    num_cores=num_cores)
-
-                workload_uid = None
+                self._workload = None
                 self._logger.info('Scheduled tasks executed')
+
+    def run(self):
+        obj_name = self._NAME.title().replace('_', '')
+
+        print('[INFO] Do not close until all sessions are processed\n'
+              '[INFO] %s running...' % obj_name)
+
+        try:
+            with self._rmq:
+                self._run()
+
+        except KeyboardInterrupt:
+            self._logger.info('%s terminated' % obj_name)
+
+        except Exception as e:
+            self._logger.exception('%s failed: %s' % (obj_name, e))
+
+        finally:
+            print('\n[INFO] %s stopped' % obj_name)
+            with self._rmq:
+                self._rmq.delete()

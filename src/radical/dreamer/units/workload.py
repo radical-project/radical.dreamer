@@ -39,3 +39,7 @@ class Workload(Munch):
     @property
     def num_tasks(self):
         return len(self.tasks)
+
+    @property
+    def tasks_list(self):
+        return self.tasks.values()

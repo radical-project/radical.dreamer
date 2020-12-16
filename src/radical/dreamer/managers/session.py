@@ -63,8 +63,6 @@ class Session(Manager):
                 workload = self._workloads.pop(0)
                 self._rmq.publish(queue=self._rmq_queues.workload,
                                   data=workload.as_dict())
-                self._rmq.publish(queue=self._rmq_queues.session,
-                                  data={'workload_uid': workload.uid})
 
                 num_not_executed_tasks = workload.num_tasks
                 while num_not_executed_tasks:

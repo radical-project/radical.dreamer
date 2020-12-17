@@ -42,4 +42,4 @@ class Workload(Munch):
 
     @property
     def tasks_list(self):
-        return self.tasks.values()
+        return list(self.tasks.values())

@@ -51,7 +51,9 @@ class ResourceManager(Manager):
 
                 self._schedule.set_tasks(self._workload.tasks_list)
 
-                for idle_cores in self._resource.idle_cores:
+                while True:
+
+                    idle_cores = self._resource.next_idle_cores
 
                     if not self._schedule.is_active:
                         if not self._resource.is_busy:

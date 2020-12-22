@@ -15,6 +15,14 @@ class ResourceCoresMixin:
     def num_cores(self):
         return len(self.cores)
 
+    @property
+    def cores_list(self):
+        return list(self.cores.values())
+
+    @property
+    def is_busy(self):
+        return bool(self._busy_cores)
+
     def process(self, tasks):
         for task in tasks:
             if task.core_uid and task.core_uid in self.cores:
@@ -30,13 +38,18 @@ class ResourceCoresMixin:
         return {c.uid: c.planned_release_time for c in self._busy_cores}
 
     @property
-    def released_cores(self):
-        if self._busy_cores:
+    def next_idle_cores(self):
+        if not self._busy_cores:
+            return self.cores_list
+        else:
             cores = []
             release_time = self._busy_cores[0].release_time
-            while release_time == self._busy_cores[0].release_time:
+            while (self.is_busy
+                    and release_time == self._busy_cores[0].release_time):
                 cores.append(self._busy_cores.pop(0))
-            yield cores
+            return cores
+        # TODO: consider the case of varying number of available cores
+        #       (third case: having idle and busy cores at the same time)
 
 
 class Resource(ResourceCoresMixin, Munch):

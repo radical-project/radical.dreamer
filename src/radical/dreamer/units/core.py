@@ -8,6 +8,7 @@ class Core(Munch):
         'uid': str,
         'perf': float,
         'perf_dynamic': float,
+        'perf_history': list,
         'io_rate': float,
         'planned_release_time': float,
         'release_time': float
@@ -17,6 +18,7 @@ class Core(Munch):
         'uid': '',
         'perf': 1.,
         'perf_dynamic': 1.,
+        'perf_history': [],
         'io_rate': 0.,
         'planned_release_time': 0.,
         'release_time': 0.
@@ -47,6 +49,9 @@ class Core(Munch):
 
         # actual release time for the current task (dynamic performance)
         task.end_time = self.release_time
+
+        # keep history of actual core performances
+        self.perf_history.append(self.perf_dynamic)
 
     # def is_busy(self, timestamp):
     #     # TODO: check exact time when is core considered as available/idle

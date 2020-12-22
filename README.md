@@ -48,14 +48,9 @@ set the URL of the following format (username/password are optional)
 Run ResourceManager (1st terminal)
 ```shell script
 # firstly activate corresponding virtualenv
-radical-dreamer-start-manager resource
+radical-dreamer-start-manager
 ```
-Run WorkloadManager (2nd terminal)
-```shell script
-# firstly activate corresponding virtualenv
-radical-dreamer-start-manager workload
-```
-Run the example of Session (3rd terminal), which sets Resource and Workload 
+Run the example of Session (2nd terminal), which sets Resource and Workload 
 descriptions
 ```shell script
 # firstly activate corresponding virtualenv
@@ -80,8 +75,7 @@ cfg_data = {
     },
     'schedule': {
         'strategy': 'smallest_to_fastest',
-        'early_binding': True,
-        'is_adaptive': False
+        'early_binding': True
     }
 }
 session = Session(cfg=Config(cfg_data))
@@ -91,9 +85,7 @@ Another option is to have all that parameters in the dedicated JSON file (e.g.,
 file as config.
 ```shell script
 # run ResourceManager
-radical-dreamer-start-manager resource --cfg_path examples/config_data.json
-# run WorkloadManager
-radical-dreamer-start-manager workload --cfg_path examples/config_data.json
+radical-dreamer-start-manager --cfg_path examples/config_data.json
 ```
 ```python
 from radical.dreamer import Config, Session

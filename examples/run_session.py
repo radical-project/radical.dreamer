@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 #
-# Resource- and Workload-Managers should be run first:
-#   radical-dreamer-start-manager resource [--cfg_path config_data.json]
-#   radical-dreamer-start-manager workload [--cfg_path config_data.json]
+# ResourceManager should be run first:
+#
+#   radical-dreamer-start-manager [--cfg_path config_data.json]
 #
 # Config "cfg_default" is used as an example and should be overwritten by user
-# (should be consistent with managers - to use ONLY one configuration) to
+# (should be consistent with the manager - to use ONLY one configuration) to
 # fulfill user's requirements (or JSON config should be used instead). If user
 # is satisfied with default config values (from "cfg_default") then only
 # RabbitMQ URL should be changed or set by the environment variable:
@@ -62,14 +62,13 @@ cfg_data = {
     },
     'schedule': {
         'strategy': 'smallest_to_fastest',
-        'early_binding': True,
-        'is_adaptive': False
+        'early_binding': True
     }
 }
 session = Session(cfg=Config(cfg_data))
 
 #   Also, "cfg_data" can be stored in JSON file and corresponding path used to 
-#   initialize the config for Session and Resource-/Workload-Managers:
+#   initialize the config for Session and ResourceManager:
 #      session = Session(cfg=Config(cfg_path='./config_data.json'))
 #   or
 #      session = Session(cfg_path='./config_data.json')

@@ -86,7 +86,7 @@ class Schedule:
 
             if not self._tasks[0].core_uid:
 
-                # initial binding for early-binding type
+                # initial binding for early-binding protocol
                 for idx, task in enumerate(self._tasks):
                     task.core_uid = core_uids[idx % num_cores]
 
@@ -108,12 +108,12 @@ class Schedule:
 
         else:
 
-            # late-binding type
+            # late-binding protocol
             for core_uid in core_uids:
                 self._tasks[0].core_uid = core_uid
                 output.append(self._tasks.pop(0))
 
-            # TODO: adaptive-binding type
+            # TODO: adaptive-binding protocol
             #       (additional data is in `kwargs`; input parameters will be
             #       extended with such additional data as planned release time
             #       per core and performance history per core)

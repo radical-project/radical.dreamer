@@ -33,6 +33,7 @@ class ResourceManager(Manager):
             # - read session data (e.g., configs) -
 
             if self._resource is None:
+                # TODO: make a review to be able to reset a resource
                 resource = self._rmq.get(self._rmq_queues.resource)
                 if resource:
                     if resource['uid'].startswith('multiresource'):
@@ -49,13 +50,13 @@ class ResourceManager(Manager):
                     self._logger.info('Workload (%s) received' %
                                       self._workload.uid)
 
-            # start to process
+            # start the processing
 
             if self._resource and self._workload:
 
                 self._schedule.set_tasks(self._workload.tasks_list)
 
-                # collect tasks to send back to the session
+                # collect tasks to send back to the session (profile records)
                 processed_tasks = []
 
                 while True:
@@ -64,6 +65,8 @@ class ResourceManager(Manager):
 
                     if not self._schedule.is_active:
                         if not self._resource.is_busy:
+
+                            # profile records are packed into messages
                             num_msgs = math.ceil(len(processed_tasks) /
                                                  PROFILE_MSG_SIZE)
                             for idx in range(num_msgs):

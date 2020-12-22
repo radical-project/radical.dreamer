@@ -5,11 +5,10 @@ from radical.utils import read_json, Munch
 
 from ..utils import EnumTypes
 
-BINDING_TYPE = EnumTypes(
+BINDING_PROTOCOL = EnumTypes(
     ('Early', 'early'),
     ('Late', 'late'),
-    ('Adaptive', 'adaptive'),
-    ('None', 'none')
+    ('Adaptive', 'adaptive')
 )
 
 try:

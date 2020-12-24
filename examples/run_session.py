@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 #
-# Resource- and Workload-Managers should be run first:
-#   radical-dreamer-start-manager resource [--cfg_path config_data.json]
-#   radical-dreamer-start-manager workload [--cfg_path config_data.json]
+# ResourceManager should be run first:
+#
+#   radical-dreamer-start-manager [--cfg_path config_data.json]
 #
 # Config "cfg_default" is used as an example and should be overwritten by user
-# (should be consistent with managers - to use ONLY one configuration) to
+# (should be consistent with the manager - to use ONLY one configuration) to
 # fulfill user's requirements (or JSON config should be used instead). If user
 # is satisfied with default config values (from "cfg_default") then only
 # RabbitMQ URL should be changed or set by the environment variable:
@@ -31,18 +31,16 @@ from radical.dreamer.configs import cfg_default
 if __name__ == '__main__':
     # Create a Resource with a specific number of cores,
     # with performance of each core drawn from a distribution
-    # (provided resource is dynamic)
+    # (provided resource is dynamic due to `var_temporal` input data)
     resource = Resource(num_cores=128,
                         perf_dist={'name': 'uniform',
                                    'mean': 32.,
-                                   'var': 2.,
-                                   'var_local': 1.},
-                        is_dynamic=True)
+                                   'var_spatial': 2.,
+                                   'var_temporal': 1.})
     # Create a Workload with a specific number of tasks,
     # with number of operations per task drawn from a distribution
     workload = Workload(num_tasks=128,
-                        ops_dist={'name': 'uniform',
-                                  'mean': 1024.})
+                        ops_dist={'mean': 1024.})
 
     # Create Session and set descriptions of Resource and Workload(s)
     session = Session(cfg=cfg_default)
@@ -64,14 +62,13 @@ cfg_data = {
     },
     'schedule': {
         'strategy': 'smallest_to_fastest',
-        'early_binding': True,
-        'is_adaptive': False
+        'early_binding': True
     }
 }
 session = Session(cfg=Config(cfg_data))
 
 #   Also, "cfg_data" can be stored in JSON file and corresponding path used to 
-#   initialize the config for Session and Resource-/Workload-Managers:
+#   initialize the config for Session and ResourceManager:
 #      session = Session(cfg=Config(cfg_path='./config_data.json'))
 #   or
 #      session = Session(cfg_path='./config_data.json')

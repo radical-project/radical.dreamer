@@ -48,14 +48,9 @@ set the URL of the following format (username/password are optional)
 Run ResourceManager (1st terminal)
 ```shell script
 # firstly activate corresponding virtualenv
-radical-dreamer-start-manager resource
+radical-dreamer-start-manager
 ```
-Run WorkloadManager (2nd terminal)
-```shell script
-# firstly activate corresponding virtualenv
-radical-dreamer-start-manager workload
-```
-Run the example of Session (3rd terminal), which sets Resource and Workload 
+Run the example of Session (2nd terminal), which sets Resource and Workload 
 descriptions
 ```shell script
 # firstly activate corresponding virtualenv
@@ -80,8 +75,7 @@ cfg_data = {
     },
     'schedule': {
         'strategy': 'smallest_to_fastest',
-        'early_binding': True,
-        'is_adaptive': False
+        'early_binding': True
     }
 }
 session = Session(cfg=Config(cfg_data))
@@ -91,9 +85,7 @@ Another option is to have all that parameters in the dedicated JSON file (e.g.,
 file as config.
 ```shell script
 # run ResourceManager
-radical-dreamer-start-manager resource --cfg_path examples/config_data.json
-# run WorkloadManager
-radical-dreamer-start-manager workload --cfg_path examples/config_data.json
+radical-dreamer-start-manager --cfg_path examples/config_data.json
 ```
 ```python
 from radical.dreamer import Config, Session
@@ -102,74 +94,74 @@ session_1 = Session(cfg_path='./config_data.json')
 session_2 = Session(cfg=Config(cfg_path='./config_data.json'))
 ```
 
-## Examples of Resource and Workflow definition
+## Examples of Resource and Workload definition
 The following examples of values distributions are applied for both, `Resource` 
 and `Workload`, the same way. More important is the meaning, which user put into
 these descriptions.
 
 ### Resource
-1) Cores performance follows a "general" distribution (`number: 36, perf: 
-normal distr {mean: 10., var: 2.}`)
+1) Homogeneous resource/cores (`number: 36, perf: 16.`)
+```python
+resource = Resource(num_cores=36,
+                    perf_dist={'mean': 16.})
+```
+2) Heterogeneous resource with normal distribution of cores performance 
+(`number: 36, perf: normal distr {mean: 16., spatial variance: 4.}`)
 ```python
 resource = Resource(num_cores=36,
                     perf_dist={'name': 'normal',
-                               'mean': 10.,
-                               'var': 2.})
+                               'mean': 16.,
+                               'var_spatial': 4.})
 ```
-2) Each core performance follows its own version of distribution (`number: 36, 
-perf: normal distr {mean: 10., var: 2.}`)
+3) Homogeneous resource with dynamism, i.e., dynamic resource (`number: 36, 
+perf: normal distr {mean: 16., temporal variance: 2.}`)
 ```python
 resource = Resource(num_cores=36,
                     perf_dist={'name': 'normal',
-                               'mean': 10.,
-                               'var_local': 2.})
+                               'mean': 16.,
+                               'var_temporal': 2.})
 ```
-3) Mean value for each core performance follows a "general" distribution and 
-each core performance follows its own version of distribution (`number: 36, 
-perf: normal distr {mean: 10., var: general -> 2., personal -> 3.}`)
+4) Heterogeneous dynamic resource with normal distribution of cores performance 
+(`number: 36, perf: normal distr {mean: 16., spatial variance: 4., temporal 
+variance: 2.}`)
 ```python
 resource = Resource(num_cores=36,
                     perf_dist={'name': 'normal',
-                               'mean': 10.,
-                               'var': 2.,
-                               'var_local': 3.})
+                               'mean': 16.,
+                               'var_spatial': 4.,
+                               'var_temporal': 2.})
 ```
-NOTE: For `poisson` distribution, parameters `var` and `var_local` are used 
-as flags only, their values are not taken into account:
-```
-var=1. -> True: poisson distribution produces mean values for cores performance
-var_local=1. -> True: poisson distribution produces values as a personal 
-distribution (each core has its own version of distribution)
-```
-4) Heterogeneous resource or resource with multiple distributions (`total
- number: 25, perf: 20 cores with normal distr and 5 cores with uniform distr`)
+5) Multiple resources or resource with multiple distributions (`total number: 
+25, 20 heterogeneous dynamic cores with normal distr and 5 homogeneous cores`)
 ```python
 resource = MultiResource(resources=[{'num_cores': 20,
                                      'perf_dist': {'name': 'normal',
-                                                   'mean': 5.,
-                                                   'var': 2.,
-                                                   'var_local': 1.}},
+                                                   'mean': 8.,
+                                                   'var_spatial': 2.,
+                                                   'var_temporal': 1.}},
                                     {'num_cores': 5,
-                                     'perf_dist': {'name': 'uniform',
-                                                   'mean': 10.}}])
+                                     'perf_dist': {'mean': 10.}}])
 ```
-5) Additional parameters for resource definition
+6) Additional parameter(s) for resource definition
  - `io_rate` (`float`) - I/O abstraction to add time for task spent on I/O
   processes (assume that I/O includes data transfers and network throughput)
- - `is_dynamic` (`bool`) - flag that defines is [multi]resource dynamic or not
-  (initially it was part of the configuration data)
+
+NOTE: There are 3 types of distributions used: `uniform`, `normal` and
+`poisson`. For `poisson` distribution, parameters `var_spatial` and 
+`var_temporal` are used as flags only, their actual values are not taken into 
+account (`var_spatial=1. -> True`, `var_temporal=1. -> True`)
 
 ### Workload
 1) Homogeneous tasks (`number: 128, ops: 10.`)
 ```python
 workload = Workload(num_tasks=128,
-                    ops_dist={'name': 'uniform',
-                              'mean': 10.})
+                    ops_dist={'mean': 10.})
 ```
-2) Heterogeneous tasks (`number: 128, ops: normal distr {mean: 5., var: 2.}`)
+2) Heterogeneous tasks (`number: 128, ops: normal distr {mean: 32., 
+spatial variance: 8.}`)
 ```python
 workload = Workload(num_tasks=128,
                     ops_dist={'name': 'normal',
-                              'mean': 5.,
-                              'var': 2.})
+                              'mean': 32.,
+                              'var_spatial': 8.})
 ```

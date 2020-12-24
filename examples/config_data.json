@@ -7,7 +7,6 @@
     },
     "schedule": {
         "strategy": "smallest_to_fastest",
-        "early_binding": true,
-        "is_adaptive": false
+        "early_binding": true
     }
 }

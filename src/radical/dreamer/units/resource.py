@@ -29,8 +29,7 @@ class ResourceCoresMixin:
                 self.set_dynamic_performance(task.core_uid)
                 # TODO: exception in case of not bound task?
                 # TODO: exception in case of core is already in a busy list?
-                self.cores[task.core_uid].run(task)
-                self._busy_cores.append(self.cores[task.core_uid])
+                self._busy_cores.append(self.cores[task.core_uid].execute(task))
         self._busy_cores.sort(key=lambda c: c.release_time)
 
     @property
@@ -43,10 +42,9 @@ class ResourceCoresMixin:
             return self.cores_list
         else:
             cores = []
-            release_time = self._busy_cores[0].release_time
-            while (self.is_busy
-                    and release_time == self._busy_cores[0].release_time):
-                cores.append(self._busy_cores.pop(0))
+            now = self._busy_cores[0].release_time
+            while self.is_busy and now == self._busy_cores[0].release_time:
+                cores.append(self._busy_cores.pop(0).release())
             return cores
         # TODO: consider the case of varying number of available cores
         #       (third case: having idle and busy cores at the same time)

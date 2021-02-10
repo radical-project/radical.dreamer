@@ -87,7 +87,7 @@ class RabbitMQ:
         """
         try:
             method_frame, header_frame, output = \
-                self._channel.basic_get(queue=queue)
+                self._channel.basic_get(queue=queue, auto_ack=True)
         except pika.exceptions.DuplicateGetOkCallback:
             output = None
         except (pika.exceptions.ChannelClosedByBroker,

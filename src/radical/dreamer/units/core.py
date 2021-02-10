@@ -1,8 +1,16 @@
 
 from radical.utils import generate_id, Munch
 
+from ..utils import EnumTypes
+
 
 class Core(Munch):
+
+    STATES = EnumTypes(
+        ('Idle', 0),
+        ('Busy', 1),
+        ('Offline', -1)
+    )
 
     _schema = {
         'uid': str,
@@ -11,7 +19,8 @@ class Core(Munch):
         'perf_history': list,
         'io_rate': float,
         'planned_release_time': float,
-        'release_time': float
+        'release_time': float,
+        'state': int
     }
 
     _defaults = {
@@ -21,7 +30,8 @@ class Core(Munch):
         'perf_history': [],
         'io_rate': 0.,
         'planned_release_time': 0.,
-        'release_time': 0.
+        'release_time': 0.,
+        'state': STATES.Idle
     }
 
     def __init__(self, **kwargs):
@@ -30,8 +40,8 @@ class Core(Munch):
         if not self.uid:
             self.uid = generate_id('core')
 
-    def run(self, task):
-        # resource.process does make a check of core_uid and task bound id.
+    def execute(self, task):
+        # resource.process does check of core_uid and task bound id.
         # if self.uid != task.core_uid:
         #     raise Exception('Task %s is not bound to Core %s' %
         #                     (task.uid, self.uid))
@@ -50,9 +60,20 @@ class Core(Munch):
         # actual release time for the current task (dynamic performance)
         task.end_time = self.release_time
 
+        self.state = self.STATES.Busy
+        return self
+
+    def release(self):
         # keep history of actual core performances
         self.perf_history.append(self.perf_dynamic)
 
-    # def is_busy(self, timestamp):
-    #     # TODO: check exact time when is core considered as available/idle
-    #     return timestamp < self.release_time
+        self.state = self.STATES.Idle
+        return self
+
+    @property
+    def is_busy(self):
+        return self.state == self.STATES.Busy
+
+    # @property
+    # def is_available(self):
+    #     return self.state != self.STATES.Offline

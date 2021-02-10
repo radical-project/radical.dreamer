@@ -1,5 +1,5 @@
 
-import numpy as np
+from numpy.random import RandomState
 
 from radical.utils import Munch
 
@@ -32,6 +32,8 @@ class SampleDistribution(Munch):
 
     @property
     def samples(self):
+        rs = RandomState()
+
         if not self.var_spatial:
             output = [self.mean] * self.size
 
@@ -42,17 +44,15 @@ class SampleDistribution(Munch):
         else:
             output = []
             if self.name == self.NAMES.Uniform:
-                output = list(np.random.uniform(self.mean - self.var_spatial,
-                                                self.mean + self.var_spatial,
-                                                self.size))
+                output = list(rs.uniform(self.mean - self.var_spatial,
+                                         self.mean + self.var_spatial,
+                                         self.size))
 
             elif self.name == self.NAMES.Normal:
-                output = list(np.random.normal(self.mean,
-                                               self.var_spatial,
-                                               self.size))
+                output = list(rs.normal(self.mean, self.var_spatial, self.size))
 
             elif self.name == self.NAMES.Poisson:
-                output = list(np.random.poisson(self.mean, self.size))
+                output = list(rs.poisson(self.mean, self.size))
                 # convert <class 'numpy.int64'> into <class 'float'>
                 # (numpy types are not JSON serializable)
                 for i in range(self.size):
@@ -62,18 +62,20 @@ class SampleDistribution(Munch):
 
     def sample_temporal(self, mean):
         output = mean
+
         if self.var_temporal:
+            rs = RandomState()
 
             if self.name == self.NAMES.Uniform:
-                output = np.random.uniform(mean - self.var_temporal,
-                                           mean + self.var_temporal)
+                output = rs.uniform(mean - self.var_temporal,
+                                    mean + self.var_temporal)
 
             elif self.name == self.NAMES.Normal:
-                output = np.random.normal(mean, self.var_temporal)
+                output = rs.normal(mean, self.var_temporal)
 
             elif self.name == self.NAMES.Poisson:
                 # convert <class 'numpy.int64'> into <class 'float'>
                 # (numpy types are not JSON serializable)
-                output = float(np.random.poisson(mean))
+                output = float(rs.poisson(mean))
 
         return output

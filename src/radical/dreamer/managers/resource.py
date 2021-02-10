@@ -32,65 +32,63 @@ class ResourceManager(Manager):
             # if session:
             # - read session data (e.g., configs) -
 
-            if self._resource is None:
-                # TODO: make a review to be able to reset a resource
-                resource = self._rmq.get(self._rmq_queues.resource)
-                if resource:
-                    if resource['uid'].startswith('multiresource'):
-                        self._resource = MultiResource(**resource)
-                    else:
-                        self._resource = Resource(**resource)
-                    self._logger.info('Resource (%s) received' %
-                                      self._resource.uid)
-
             if self._workload is None:
                 workload = self._rmq.get(self._rmq_queues.workload)
-                if workload:
-                    self._workload = Workload(**workload)
-                    self._logger.info('Workload (%s) received' %
-                                      self._workload.uid)
+                if not workload:
+                    continue
+                self._workload = Workload(**workload)
+                self._logger.info('Workload (%s) received' % self._workload.uid)
+
+            resource = self._rmq.get(self._rmq_queues.resource)
+            if resource:
+                if resource['uid'].startswith('multiresource'):
+                    self._resource = MultiResource(**resource)
+                else:
+                    self._resource = Resource(**resource)
+                self._logger.info('Resource (%s) received' % self._resource.uid)
+
+            if not self._resource:
+                continue
 
             # start the processing
 
-            if self._resource and self._workload:
+            self._schedule.set_tasks(self._workload.tasks_list)
 
-                self._schedule.set_tasks(self._workload.tasks_list)
+            # collect tasks to send back to the session (profile records)
+            processed_tasks = []
 
-                # collect tasks to send back to the session (profile records)
-                processed_tasks = []
+            while True:
 
-                while True:
+                idle_cores = self._resource.next_idle_cores
 
-                    idle_cores = self._resource.next_idle_cores
+                if not self._schedule.is_active:
+                    if not self._resource.is_busy:
 
-                    if not self._schedule.is_active:
-                        if not self._resource.is_busy:
+                        # profile records are packed into messages
+                        num_msgs = math.ceil(len(processed_tasks) /
+                                             PROFILE_MSG_SIZE)
+                        for idx in range(num_msgs):
+                            # publish profile data
+                            self._rmq.publish(
+                                queue=self._rmq_queues.profile,
+                                data=Task.demunch(
+                                    processed_tasks[
+                                        idx * PROFILE_MSG_SIZE:
+                                        (idx + 1) * PROFILE_MSG_SIZE]))
+                        del processed_tasks[:]
 
-                            # profile records are packed into messages
-                            num_msgs = math.ceil(len(processed_tasks) /
-                                                 PROFILE_MSG_SIZE)
-                            for idx in range(num_msgs):
-                                # publish profile data
-                                self._rmq.publish(
-                                    queue=self._rmq_queues.profile,
-                                    data=Task.demunch(
-                                        processed_tasks[
-                                            idx * PROFILE_MSG_SIZE:
-                                            (idx + 1) * PROFILE_MSG_SIZE]))
-                            del processed_tasks[:]
+                        # exit processing (no new tasks, no busy cores)
+                        break
+                    else:
+                        # emulate cycle(s) to release last busy cores
+                        continue
 
-                            # exit processing (no new tasks, no busy cores)
-                            break
-                        else:
-                            # emulate cycle(s) to release last busy cores
-                            continue
+                tasks = self._schedule.get_scheduled_tasks(idle_cores)
+                self._resource.process(tasks)
+                processed_tasks.extend(tasks)
 
-                    tasks = self._schedule.get_scheduled_tasks(idle_cores)
-                    self._resource.process(tasks)
-                    processed_tasks.extend(tasks)
-
-                self._workload = None
-                self._logger.info('Scheduled tasks executed')
+            self._workload = None
+            self._logger.info('Scheduled tasks executed')
 
     def run(self):
         obj_name = self._NAME.title().replace('_', '')

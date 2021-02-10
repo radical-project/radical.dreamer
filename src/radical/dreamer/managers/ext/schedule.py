@@ -39,8 +39,13 @@ class Schedule:
         if order_reverse is None:
             if self._cfg.strategy == 'random':
                 random.shuffle(cores)
-        else:
+        elif self._cfg.early_binding:
             cores.sort(key=lambda c: c.perf, reverse=order_reverse)
+        else:
+            if order_reverse:
+                cores.sort(key=lambda c: (c.release_time, -c.perf))
+            else:
+                cores.sort(key=lambda c: (c.release_time, c.perf))
 
         return cores
 

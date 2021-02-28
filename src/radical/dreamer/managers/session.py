@@ -55,6 +55,10 @@ class Session(Manager):
         self._profile_data.clear()
 
         with self._rmq:
+
+            if self._resource is None or not self._workloads:
+                raise Exception('Resource and/or Workload(s) are not set')
+
             self._rmq.publish(queue=self._rmq_queues.resource,
                               data=self._resource.as_dict())
 

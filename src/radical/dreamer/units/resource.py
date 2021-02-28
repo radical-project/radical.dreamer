@@ -10,6 +10,7 @@ class ResourceCoresMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._busy_cores = []
+        self._timestamp = 0.
 
     @property
     def num_cores(self):
@@ -28,7 +29,7 @@ class ResourceCoresMixin:
             if task.core_uid and task.core_uid in self.cores:
                 self.set_dynamic_performance(task.core_uid)
                 # TODO: exception in case of not bound task?
-                # TODO: exception in case of core is already in a busy list?
+                # TODO: exception in case of core is already busy or offline?
                 self._busy_cores.append(self.cores[task.core_uid].execute(task))
         self._busy_cores.sort(key=lambda c: c.release_time)
 
@@ -38,16 +39,30 @@ class ResourceCoresMixin:
 
     @property
     def next_idle_cores(self):
-        if not self._busy_cores:
-            return self.cores_list
+        output = []
+        if not self.is_busy:
+            output.extend(self.cores_list)
         else:
-            cores = []
-            now = self._busy_cores[0].release_time
-            while self.is_busy and now == self._busy_cores[0].release_time:
-                cores.append(self._busy_cores.pop(0).release())
-            return cores
+            self._timestamp = self._busy_cores[0].release_time
+            while self._timestamp == self._busy_cores[0].release_time:
+                output.append(self._busy_cores.pop(0).release())
+                if not self.is_busy:
+                    break
+        return output
         # TODO: consider the case of varying number of available cores
         #       (third case: having idle and busy cores at the same time)
+
+    @property
+    def cores_perf_history(self):
+        output = {}
+        for core in self.cores.values():
+            output[core.uid] = list(core.perf_history)
+            if core.state == Core.STATES.Busy \
+                    and core.planned_release_time < self._timestamp:
+                # consider core's current performance that got decreased
+                output[core.uid].append(
+                    (core.planned_release_time / self._timestamp) * core.perf)
+        return output
 
 
 class Resource(ResourceCoresMixin, Munch):

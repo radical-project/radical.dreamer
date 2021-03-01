@@ -61,7 +61,7 @@ class CoreTestClass(TestCase):
 
         for test_case in self._test_cases:
 
-            if 'task' not in test_case and 'result_execute' not in test_case:
+            if 'task' not in test_case or 'result_execute' not in test_case:
                 continue
 
             t = Task(**test_case['task'])

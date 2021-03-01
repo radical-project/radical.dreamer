@@ -34,7 +34,7 @@ class TaskTestClass(TestCase):
 
         # with input data
         for test_case in self._test_cases:
-            print(test_case)
+
             t = Task(**test_case['input'])
 
             result = dict(test_case['input'])

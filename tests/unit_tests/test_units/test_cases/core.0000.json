@@ -1,0 +1,37 @@
+[
+    {
+        "input": {
+            "uid": "test_core.0000",
+            "perf": 9.0,
+            "perf_dynamic": 99.0,
+            "perf_history": [1.0, 2.0, 3.0],
+            "io_rate": 999.0,
+            "planned_release_time": 11.0,
+            "release_time": 111.0,
+            "state": 0
+        }
+    },
+    {
+        "input": {
+            "uid": "exec_core.0000",
+            "perf": 5.0,
+            "perf_dynamic": 3.0,
+            "io_rate": 10.0,
+            "planned_release_time": 0.0,
+            "release_time": 10.0,
+            "state": 0
+        },
+        "task": {
+            "ops": 15.0,
+            "start_time": 0.0,
+            "end_time": 0.0,
+            "core_uid": "exec_core.0000"
+        },
+        "result_execute": {
+            "perf_history": [],
+            "planned_release_time": 14.5,
+            "release_time": 16.5,
+            "state": 1
+        }
+    }
+]

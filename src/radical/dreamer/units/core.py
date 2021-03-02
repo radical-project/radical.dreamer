@@ -18,8 +18,10 @@ class Core(Munch):
         'perf_dynamic': float,
         'perf_history': list,
         'io_rate': float,
-        'planned_release_time': float,
+        'acquire_time': float,
         'release_time': float,
+        'planned_release_time': float,
+        'planned_execute_time': float,
         'state': int
     }
 
@@ -29,8 +31,10 @@ class Core(Munch):
         'perf_dynamic': 1.,
         'perf_history': [],
         'io_rate': 0.,
-        'planned_release_time': 0.,
+        'acquire_time': 0.,
         'release_time': 0.,
+        'planned_release_time': 0.,
+        'planned_execute_time': 0.,
         'state': STATES.Idle
     }
 
@@ -46,16 +50,21 @@ class Core(Munch):
         #     raise Exception('Task %s is not bound to Core %s' %
         #                     (task.uid, self.uid))
 
-        # get core release time (from the previous task)
-        task.start_time = self.release_time
+        # core's time of acquire is equal to the previous time of release
+        self.acquire_time = self.release_time
+        # task start time is the time of core got acquired
+        task.start_time = self.acquire_time
 
-        self.planned_release_time = task.start_time + (task.ops / self.perf)
+        self.planned_execute_time = task.ops / self.perf
         self.release_time += task.ops / self.perf_dynamic
 
         if self.io_rate:
             io_task_duration = task.ops / self.io_rate
-            self.planned_release_time += io_task_duration
+            self.planned_execute_time += io_task_duration
             self.release_time += io_task_duration
+
+        # keep both values for planned release and execute times
+        self.planned_release_time = task.start_time + self.planned_execute_time
 
         # actual release time for the current task (dynamic performance)
         task.end_time = self.release_time
@@ -67,6 +76,7 @@ class Core(Munch):
         # keep history of actual core performances
         self.perf_history.append(self.perf_dynamic)
 
+        self.planned_execute_time = 0.
         self.state = self.STATES.Idle
         return self
 

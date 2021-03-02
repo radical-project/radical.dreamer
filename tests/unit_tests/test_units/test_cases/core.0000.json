@@ -6,8 +6,10 @@
             "perf_dynamic": 99.0,
             "perf_history": [1.0, 2.0, 3.0],
             "io_rate": 999.0,
-            "planned_release_time": 11.0,
+            "acquire_time": 100.0,
             "release_time": 111.0,
+            "planned_release_time": 110.0,
+            "planned_execute_time": 5.0,
             "state": 0
         }
     },
@@ -17,8 +19,10 @@
             "perf": 5.0,
             "perf_dynamic": 3.0,
             "io_rate": 10.0,
-            "planned_release_time": 0.0,
+            "acquire_time": 5.0,
             "release_time": 10.0,
+            "planned_release_time": 0.0,
+            "planned_execute_time": 0.0,
             "state": 0
         },
         "task": {
@@ -29,8 +33,10 @@
         },
         "result_execute": {
             "perf_history": [],
-            "planned_release_time": 14.5,
+            "acquire_time": 10.0,
             "release_time": 16.5,
+            "planned_release_time": 14.5,
+            "planned_execute_time": 4.5,
             "state": 1
         }
     }

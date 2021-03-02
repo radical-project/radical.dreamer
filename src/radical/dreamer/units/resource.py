@@ -57,11 +57,14 @@ class ResourceCoresMixin:
         output = {}
         for core in self.cores.values():
             output[core.uid] = list(core.perf_history)
-            if core.state == Core.STATES.Busy \
-                    and core.planned_release_time < self._timestamp:
-                # consider core's current performance that got decreased
-                output[core.uid].append(
-                    (core.planned_release_time / self._timestamp) * core.perf)
+            if core.is_busy:
+                # consider core's current performance
+                perf_current = core.perf
+                if core.planned_release_time < self._timestamp:
+                    # decreased value of performance
+                    perf_current *= core.planned_execute_time / \
+                                    (self._timestamp - core.acquire_time)
+                output[core.uid].append(perf_current)
         return output
 
 

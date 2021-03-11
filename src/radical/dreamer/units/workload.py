@@ -19,8 +19,10 @@ class Workload(Munch):
     }
 
     def __init__(self, **kwargs):
+        kwargs.setdefault('ops_dist', {})
+
         if 'num_tasks' in kwargs:
-            kwargs.setdefault('ops_dist', {})['size'] = kwargs['num_tasks']
+            kwargs['ops_dist']['size'] = kwargs['num_tasks']
             del kwargs['num_tasks']
 
         super().__init__(from_dict=kwargs)

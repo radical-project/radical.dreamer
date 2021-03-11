@@ -1,0 +1,36 @@
+[
+    {
+        "input": {
+            "uid": "test_workload.0000",
+            "num_tasks": 10,
+            "ops_dist": {
+                "name": "normal",
+                "mean": 5.0,
+                "var_spatial": 1.0,
+                "var_temporal": 1.0
+            }
+        }
+    },
+    {
+        "input": {
+            "uid": "test_workload.0001",
+            "ops_dist": {"size": 2},
+            "tasks": {
+                "test_task.0000": {
+                    "uid": "test_task.0000",
+                    "ops": 3.0,
+                    "start_time": 10.0,
+                    "end_time": 110.0,
+                    "core_uid": "exec_core.0001"
+                },
+                "test_task.0001": {
+                    "uid": "test_task.0001",
+                    "ops": 13.0,
+                    "start_time": 20.0,
+                    "end_time": 120.0,
+                    "core_uid": "exec_core.0000"
+                }
+            }
+        }
+    }
+]

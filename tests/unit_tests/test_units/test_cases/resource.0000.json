@@ -50,8 +50,6 @@
         "input": {
             "uid": "test_resource.0003",
             "perf_dist": {
-                "mean": 7.0,
-                "var_spatial": 2.0,
                 "var_temporal": 2.0,
                 "size": 1
             },

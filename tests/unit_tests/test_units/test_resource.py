@@ -123,4 +123,5 @@ class ResourceTestClass(TestCase):
                                         r.cores_perf_history[c.uid][-1])
 
             # FIXME: add a test case with multiple input tasks
+            #        (check decreased value of performance in perf_history)
             # if test_case.get('tasks')

@@ -27,8 +27,14 @@ class MultiResource(ResourceCoresMixin, Munch):
         if not self.uid:
             self.uid = generate_id('multiresource')
 
+        core_uids = set()
         for idx in range(len(self.resources)):
             self.resources[idx] = Resource(**self.resources[idx])
+
+            if not core_uids.isdisjoint(self.resources[idx].cores):
+                raise Exception('Core(s) belongs to different Resources')
+            core_uids.update(self.resources[idx].cores)
+
             self.cores.update(self.resources[idx].cores)
 
     def set_dynamic_performance(self, core_uid):

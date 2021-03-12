@@ -1,0 +1,36 @@
+[
+    {
+        "input": {
+            "resources": [
+                {
+                    "uid": "test_resource.0000",
+                    "num_cores": 10
+                },
+                {
+                    "uid": "test_resource.0001",
+                    "num_cores": 20
+                }
+            ]
+        }
+    },
+    {
+        "input": {
+            "resources": [
+                {
+                    "uid": "test_resource.0000",
+                    "num_cores": 10,
+                    "perf_dist": {
+                        "var_temporal": 2.0
+                    }
+                },
+                {
+                    "uid": "test_resource.0001",
+                    "num_cores": 20,
+                    "perf_dist": {
+                        "var_temporal": 4.0
+                    }
+                }
+            ]
+        }
+    }
+]

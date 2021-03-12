@@ -84,8 +84,10 @@ class Resource(ResourceCoresMixin, Munch):
     }
 
     def __init__(self, **kwargs):
+        kwargs.setdefault('perf_dist', {})
+
         if 'num_cores' in kwargs:
-            kwargs.setdefault('perf_dist', {})['size'] = kwargs['num_cores']
+            kwargs['perf_dist']['size'] = kwargs['num_cores']
             del kwargs['num_cores']
 
         super().__init__(from_dict=kwargs)

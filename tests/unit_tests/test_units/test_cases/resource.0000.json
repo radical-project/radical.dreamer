@@ -1,0 +1,72 @@
+[
+    {
+        "input": {
+            "uid": "test_resource.0000",
+            "num_cores": 15,
+            "perf_dist": {
+                "name": "normal",
+                "mean": 7.0,
+                "var_spatial": 2.0,
+                "var_temporal": 2.0
+            }
+        }
+    },
+    {
+        "input": {
+            "uid": "test_resource.0001",
+            "perf_dist": {"size": 2},
+            "io_rate": 7.0,
+            "cores": {
+                "test_core.0010": {
+                    "uid": "test_core.0010",
+                    "perf": 11.0
+                },
+                "test_core.0011": {
+                    "uid": "test_core.0011",
+                    "perf": 13.0
+                }
+            }
+        }
+    },
+    {
+        "input": {
+            "uid": "test_resource.0002",
+            "perf_dist": {"size": 1},
+            "cores": {
+                "test_core.0020": {
+                    "uid": "test_core.0020",
+                    "perf": 11.0
+                }
+            }
+        },
+        "task": {
+            "ops": 15.0,
+            "start_time": 0.0,
+            "end_time": 0.0,
+            "core_uid": "test_core.0020"
+        }
+    },
+    {
+        "input": {
+            "uid": "test_resource.0003",
+            "perf_dist": {
+                "mean": 7.0,
+                "var_spatial": 2.0,
+                "var_temporal": 2.0,
+                "size": 1
+            },
+            "cores": {
+                "test_core.0030": {
+                    "uid": "test_core.0030",
+                    "perf": 11.0
+                }
+            }
+        },
+        "task": {
+            "ops": 15.0,
+            "start_time": 0.0,
+            "end_time": 0.0,
+            "core_uid": "test_core.0030"
+        }
+    }
+]

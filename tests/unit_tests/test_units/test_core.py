@@ -97,8 +97,8 @@ class CoreTestClass(TestCase):
             if 'task' not in test_case:
                 continue
 
-            t = Task(**test_case['task'])
             c = Core(**test_case['input'])
+            t = Task(**test_case['task'])
 
             c.execute(task=t)
             perf_history_len = len(c.perf_history)

@@ -28,10 +28,15 @@ class WorkloadTestClass(TestCase):
         w = Workload()
 
         self.assertTrue(w.uid.startswith('workload.'))
-        self.assertIsInstance(w.tasks, dict)
-        self.assertIsInstance(w.tasks_list[0], Task)
         self.assertIsInstance(w.ops_dist, SampleDistribution)
+        self.assertIsInstance(w.tasks, dict)
+        self.assertEqual(w.num_tasks, 0)
+        self.assertEqual(w.size, 1)
+
+        w = Workload(set_tasks=True)
+
         self.assertEqual(w.num_tasks, 1)
+        self.assertIsInstance(w.tasks_list[0], Task)
 
         # with input data
         for test_case in self._test_cases:
@@ -46,9 +51,10 @@ class WorkloadTestClass(TestCase):
                 for k, v in SampleDistribution._defaults.items():
                     if k not in result:
                         result[k] = v
+                self.assertEqual(w.num_tasks, result['size'])
+                self.assertEqual(w.size, result['size'])
                 self.assertEqual(w.ops_dist.size, result['size'])
                 self.assertEqual(w.ops_dist.name, result['name'])
-                self.assertEqual(w.num_tasks, result['size'])
 
             if test_case['input'].get('tasks'):
                 result = test_case['input']['tasks']

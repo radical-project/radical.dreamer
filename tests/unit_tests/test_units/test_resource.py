@@ -28,14 +28,19 @@ class ResourceTestClass(TestCase):
         r = Resource()
 
         self.assertTrue(r.uid.startswith('resource.'))
-        self.assertIsInstance(r.cores, dict)
-        self.assertIsInstance(r.cores_list[0], Core)
         self.assertIsInstance(r.perf_dist, SampleDistribution)
+        self.assertIsInstance(r.cores, dict)
+        self.assertEqual(r.num_cores, 0)
+        self.assertEqual(r.size, 1)
         self.assertEqual(r.io_rate, 0.)
-        self.assertEqual(r.num_cores, 1)
-        self.assertEqual(r.cores_list, r.next_idle_cores)
         self.assertFalse(r.is_busy)
         self.assertFalse(r.planned_release_times)
+
+        r = Resource(set_cores=True)
+
+        self.assertEqual(r.num_cores, 1)
+        self.assertEqual(r.cores_list, r.next_idle_cores)
+        self.assertIsInstance(r.cores_list[0], Core)
 
         # with input data
         for test_case in self._test_cases:
@@ -53,9 +58,10 @@ class ResourceTestClass(TestCase):
                 for k, v in SampleDistribution._defaults.items():
                     if k not in result:
                         result[k] = v
+                self.assertEqual(r.num_cores, result['size'])
+                self.assertEqual(r.size, result['size'])
                 self.assertEqual(r.perf_dist.size, result['size'])
                 self.assertEqual(r.perf_dist.name, result['name'])
-                self.assertEqual(r.num_cores, result['size'])
 
             if test_case['input'].get('cores'):
                 result = test_case['input']['cores']

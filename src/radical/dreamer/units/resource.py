@@ -83,7 +83,7 @@ class Resource(ResourceCoresMixin, Munch):
         'cores': {}
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, set_cores=False, **kwargs):
         kwargs.setdefault('perf_dist', {})
 
         if 'num_cores' in kwargs:
@@ -95,13 +95,30 @@ class Resource(ResourceCoresMixin, Munch):
         if not self.uid:
             self.uid = generate_id('resource')
 
-        if not self.cores:
+        if set_cores or self.cores:
+            self.set_cores(cores=self.cores)
+
+    @property
+    def size(self):
+        return self.perf_dist.size
+
+    def set_cores(self, cores=None):
+        """
+        [Re]generate Core objects.
+
+        @param cores: Cores descriptions.
+        @type cores: dict/None
+        """
+        if not cores:
+            self.cores.clear()
             for p in self.perf_dist.samples:
                 core = Core(perf=abs(p), io_rate=self.io_rate)
                 self.cores[core.uid] = core
         else:
+            self.cores = dict(cores)
             for uid in self.cores:
                 self.cores[uid] = Core(**self.cores[uid])
+            self.perf_dist.size = self.num_cores
 
     def set_dynamic_performance(self, core_uid):
         """

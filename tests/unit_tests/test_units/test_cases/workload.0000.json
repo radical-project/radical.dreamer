@@ -8,7 +8,8 @@
                 "mean": 5.0,
                 "var_spatial": 1.0,
                 "var_temporal": 1.0
-            }
+            },
+            "set_tasks": true
         }
     },
     {

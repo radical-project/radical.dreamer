@@ -36,15 +36,15 @@ class ResourceManager(Manager):
                 workload = self._rmq.get(self._rmq_queues.workload)
                 if not workload:
                     continue
-                self._workload = Workload(**workload)
+                self._workload = Workload(set_tasks=True, **workload)
                 self._logger.info('Workload (%s) received' % self._workload.uid)
 
             resource = self._rmq.get(self._rmq_queues.resource)
             if resource:
                 if resource['uid'].startswith('multiresource'):
-                    self._resource = MultiResource(**resource)
+                    self._resource = MultiResource(set_cores=True, **resource)
                 else:
-                    self._resource = Resource(**resource)
+                    self._resource = Resource(set_cores=True, **resource)
                 self._logger.info('Resource (%s) received' % self._resource.uid)
 
             if not self._resource:

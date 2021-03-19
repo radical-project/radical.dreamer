@@ -37,6 +37,11 @@ class MultiResourceTestClass(TestCase):
         self.assertIsInstance(mr.resources, list)
         self.assertIsInstance(mr.resources[0].cores, dict)
         self.assertEqual(len(mr.resources), 1)
+        self.assertEqual(mr.num_cores, 0)
+        self.assertEqual(mr.size, 1)
+
+        mr = MultiResource(resources=[{}], set_cores=True)
+
         self.assertEqual(mr.num_cores, 1)
 
         # with input data

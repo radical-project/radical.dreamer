@@ -39,6 +39,9 @@ class Core(Munch):
     }
 
     def __init__(self, **kwargs):
+        if 'perf_dynamic' not in kwargs and 'perf' in kwargs:
+            kwargs['perf_dynamic'] = kwargs['perf']
+
         super().__init__(from_dict=kwargs)
 
         if not self.uid:

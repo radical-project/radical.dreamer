@@ -46,9 +46,7 @@ class Workload(Munch):
                 task = Task(ops=abs(o))
                 self.tasks[task.uid] = task
         else:
-            self.tasks = dict(tasks)
-            for uid in self.tasks:
-                self.tasks[uid] = Task(**self.tasks[uid])
+            self.tasks = {uid: Task(**task) for uid, task in tasks.items()}
             self.ops_dist.size = self.num_tasks
 
     @property

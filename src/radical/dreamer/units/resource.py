@@ -115,9 +115,7 @@ class Resource(ResourceCoresMixin, Munch):
                 core = Core(perf=abs(p), io_rate=self.io_rate)
                 self.cores[core.uid] = core
         else:
-            self.cores = dict(cores)
-            for uid in self.cores:
-                self.cores[uid] = Core(**self.cores[uid])
+            self.cores = {uid: Core(**core) for uid, core in cores.items()}
             self.perf_dist.size = self.num_cores
 
     def set_dynamic_performance(self, core_uid):

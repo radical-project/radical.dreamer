@@ -110,10 +110,9 @@ class Resource(ResourceCoresMixin, Munch):
         @type cores: dict/None
         """
         if not cores:
-            self.cores.clear()
-            for p in self.perf_dist.samples:
-                core = Core(perf=abs(p), io_rate=self.io_rate)
-                self.cores[core.uid] = core
+            self.cores = {c['uid']: c for c in map(
+                lambda x: Core(perf=abs(x), io_rate=self.io_rate),
+                self.perf_dist.samples)}
         else:
             self.cores = {uid: Core(**core) for uid, core in cores.items()}
             self.perf_dist.size = self.num_cores

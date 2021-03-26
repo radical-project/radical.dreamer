@@ -41,10 +41,8 @@ class Workload(Munch):
         @type tasks: dict/None
         """
         if not tasks:
-            self.tasks.clear()
-            for o in self.ops_dist.samples:
-                task = Task(ops=abs(o))
-                self.tasks[task.uid] = task
+            self.tasks = {t['uid']: t for t in map(lambda x: Task(ops=abs(x)),
+                                                   self.ops_dist.samples)}
         else:
             self.tasks = {uid: Task(**task) for uid, task in tasks.items()}
             self.ops_dist.size = self.num_tasks

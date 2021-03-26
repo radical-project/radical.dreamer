@@ -94,3 +94,32 @@ class RabbitMQ:
                 pika.exceptions.ChannelWrongStateError):
             raise KeyboardInterrupt
         return output if not output else json.loads(output)
+
+    def collect(self, queue, count):
+        """
+        Get list of a certain number of messages from the queue.
+
+        :param queue: Queue name.
+        :type queue: str
+        :param count: Number of messages to get.
+        :type count: int
+        :return: List of messages.
+        :rtype: list
+        """
+        output = []
+        try:
+            for _, _, body in self._channel.consume(queue, auto_ack=True):
+                if body:
+                    output.extend(json.loads(body))
+                    if len(output) >= count:
+                        break
+            ### - approach with `get` method -
+            # while count:
+            #     output_list = self.get(queue)
+            #     if output_list:
+            #         output.extend(output_list)
+            #         count -= len(output_list)
+        except (pika.exceptions.ChannelClosedByBroker,
+                pika.exceptions.ChannelWrongStateError):
+            raise KeyboardInterrupt
+        return output

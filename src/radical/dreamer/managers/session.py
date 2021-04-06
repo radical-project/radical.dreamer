@@ -5,6 +5,9 @@ from radical.utils import write_json, generate_id, ID_CUSTOM
 
 from ..units import MultiResource, Resource, Workload
 
+from .resource import ResourceManager
+from .ext.schedule import Schedule
+
 from ._base import Manager
 
 
@@ -12,8 +15,8 @@ class Session(Manager):
 
     _NAME = Manager.NAMES.Session
 
-    def __init__(self, cfg=None, cfg_path=None):
-        super().__init__(cfg=cfg, cfg_path=cfg_path)
+    def __init__(self, cfg=None, cfg_path=None, is_peer=False, **kwargs):
+        super().__init__(cfg=cfg, cfg_path=cfg_path, is_peer=is_peer, **kwargs)
 
         self._resource = None
         self._workloads = []
@@ -21,6 +24,9 @@ class Session(Manager):
 
     def _cfg_setup(self, cfg):
         self._cfg = cfg.session
+
+        if self._is_peer:
+            self._schedule = Schedule(cfg=cfg.schedule)
 
     def set(self, **kwargs):
         """
@@ -51,13 +57,21 @@ class Session(Manager):
         Publish defined objects (resource and workloads) to RMQ and collect
         output profile data per run (profile data is grouped per workload).
         """
+        if self._resource is None or not self._workloads:
+            raise Exception('Resource and/or Workload(s) are not set')
+
         # clean up profile data (i.e., profile per run)
         self._profile_data.clear()
 
-        with self._rmq:
+        if not self._is_peer:
+            self._run_as_client()
+        else:
+            self._run_as_peer()
 
-            if self._resource is None or not self._workloads:
-                raise Exception('Resource and/or Workload(s) are not set')
+        self._save_profile()
+
+    def _run_as_client(self):
+        with self._rmq:
 
             self._rmq.publish(queue=self._rmq_queues.resource,
                               data=self._resource.as_dict())
@@ -65,21 +79,27 @@ class Session(Manager):
             while self._workloads:
 
                 workload = self._workloads.pop(0)
+
                 self._rmq.publish(queue=self._rmq_queues.workload,
                                   data=workload.as_dict())
+                self._set_profile(workload_uid=workload.uid,
+                                  tasks=self._rmq.collect(
+                                      queue=self._rmq_queues.profile,
+                                      count=workload.size))
 
-                num_not_executed_tasks = workload.size
-                while num_not_executed_tasks:
+    def _run_as_peer(self):
+        while self._workloads:
 
-                    executed_tasks = self._rmq.get(self._rmq_queues.profile)
-                    if not executed_tasks:
-                        continue
+            workload = self._workloads.pop(0)
 
-                    self._set_profile(workload_uid=workload.uid,
-                                      tasks=executed_tasks)
-                    num_not_executed_tasks -= len(executed_tasks)
+            self._logger.info('Processing starts')
+            processed_tasks = ResourceManager.processing(
+                resource=self._resource,
+                workload=workload,
+                schedule=self._schedule)
 
-        self._save_profile()
+            self._set_profile(workload_uid=workload.uid,
+                              tasks=processed_tasks)
 
     def _set_profile(self, workload_uid, tasks):
         for task in tasks:
@@ -92,6 +112,7 @@ class Session(Manager):
                 'exec_time': task['end_time'] - task['start_time']})
 
     def _save_profile(self):
+        self._logger.info('Save profile data records')
         file_path = os.path.join(
             os.path.dirname(self._cfg.profile_base_name),
             '.'.join([os.path.basename(self._cfg.profile_base_name),

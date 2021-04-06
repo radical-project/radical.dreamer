@@ -78,6 +78,7 @@ cfg_data = {
     }
 }
 session = Session(cfg=Config(cfg_data))
+# or session = Session(cfg=cfg_data)
 
 #   Also, "cfg_data" can be stored in JSON file and corresponding path used to 
 #   initialize the config for Session and ResourceManager:

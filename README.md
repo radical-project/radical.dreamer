@@ -1,7 +1,7 @@
 # RADICAL-DREAMER: Dynamic Runtime and Execution Adaptive Middleware EmulatoR
 
-[![Build Status](https://github.com/radical-project/radical.dreamer/actions/workflows/python-app.yml/badge.svg)](https://github.com/radical-project/radical.dreamer/actions/workflows/python-app.yml)
-[![codecov](https://codecov.io/gh/radical-project/radical.dreamer/branch/devel/graph/badge.svg)](https://codecov.io/gh/radical-project/radical.dreamer)
+[![Build](https://github.com/radical-project/radical.dreamer/actions/workflows/python-app.yml/badge.svg)](https://github.com/radical-project/radical.dreamer/actions/workflows/python-app.yml)
+[![Codecov](https://codecov.io/gh/radical-project/radical.dreamer/branch/devel/graph/badge.svg)](https://codecov.io/gh/radical-project/radical.dreamer)
 
 
 ## Requirements

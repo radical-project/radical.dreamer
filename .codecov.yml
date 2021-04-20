@@ -1,6 +1,3 @@
-codecov:
-  max_report_age: off
-
 coverage:
   status:
     project:

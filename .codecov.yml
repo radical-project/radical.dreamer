@@ -1,0 +1,18 @@
+codecov:
+  max_report_age: off
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        paths:
+          - "src"
+    patch: off
+
+github_checks:
+  annotations: false
+
+fixes:
+  - "*/site-packages/radical/dreamer/::src/radical/dreamer/"

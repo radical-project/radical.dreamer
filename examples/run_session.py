@@ -60,29 +60,26 @@ if __name__ == '__main__':
     # Publish objects to RMQ and collect output profiles
     session.run()
 
-"""
-### Config example:
 
-from radical.dreamer import Config, Session
-
-cfg_data = {
-    'rabbitmq': {
-        'url': 'amqp://localhost:5672/'
-    },
-    'session': {
-        'profile_base_name': './rd.profile'
-    },
-    'schedule': {
-        'strategy': 'smallest_to_fastest',
-        'early_binding': True
-    }
-}
-session = Session(cfg=Config(cfg_data))
-# or session = Session(cfg=cfg_data)
-
-#   Also, "cfg_data" can be stored in JSON file and corresponding path used to 
-#   initialize the config for Session and ResourceManager:
-#      session = Session(cfg=Config(cfg_path='./config_data.json'))
-#   or
-#      session = Session(cfg_path='./config_data.json')
-"""
+# ### Examples of config setup for the Session definition:
+#
+# from radical.dreamer import Config, Session
+#
+# cfg_data = {
+#     'rabbitmq': {
+#         'url': 'amqp://localhost:5672/'
+#     },
+#     'session': {
+#         'profile_base_name': './rd.profile'
+#     },
+#     'schedule': {
+#         'strategy': 'smallest_to_fastest',
+#         'early_binding': True
+#     }
+# }
+#
+# session_00 = Session(cfg=cfg_data)
+# session_01 = Session(cfg=Config(cfg_data))
+# session_02 = Session(cfg=Config(cfg_path='./config_data.json'))
+# session_03 = Session(cfg_path='./config_data.json')
+#

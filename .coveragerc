@@ -1,0 +1,6 @@
+[run]
+branch = True
+source = radical/dreamer
+
+omit =
+    tests/*

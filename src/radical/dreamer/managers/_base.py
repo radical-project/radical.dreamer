@@ -16,10 +16,6 @@ class Manager:
     )
 
     def __init__(self, cfg=None, cfg_path=None, **kwargs):
-        self._uid = generate_id('rd.%s' % self._NAME, mode=ID_UNIQUE)
-        self._logger = Logger(self._uid, ns='radical.dreamer')
-        self._is_peer = bool(kwargs.get('is_peer', False))
-
         if not cfg and not cfg_path:
             # cfg = Config(from_dict={})
             raise Exception('Configuration is not set')
@@ -27,6 +23,10 @@ class Manager:
             cfg = Config(cfg_path=cfg_path)
         else:
             cfg = Config(from_dict=cfg)
+
+        self._uid = generate_id('rd.%s' % self._NAME, mode=ID_UNIQUE)
+        self._logger = Logger(self._uid, ns='radical.dreamer')
+        self._is_peer = bool(kwargs.get('is_peer', False))
 
         if not self._is_peer:
             self._rmq_setup(cfg)

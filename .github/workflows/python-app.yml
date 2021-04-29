@@ -26,7 +26,6 @@ jobs:
         . testenv/bin/activate
         python -m pip install --upgrade pip setuptools
         python -m pip install --upgrade .
-        python -m pip install psutil
         python -m pip install coverage
         python -m pip install codecov
         python -m pip install pytest

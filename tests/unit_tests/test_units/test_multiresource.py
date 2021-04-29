@@ -27,7 +27,7 @@ class MultiResourceTestClass(TestCase):
             _ = MultiResource(resources=None)
 
         with self.assertRaises(Exception):
-            _ = MultiResource(resources='wrong_resource')
+            _ = MultiResource(resources='wrong_resource_type')
 
         # default attributes
         mr = MultiResource(resources=[{}])

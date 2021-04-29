@@ -29,25 +29,26 @@ from radical.dreamer.configs import cfg_default
 
 
 if __name__ == '__main__':
-    # Create a Resource with a specific number of cores,
-    # with performance of each core drawn from a distribution
-    # (provided resource is dynamic due to `var_temporal` input data)
+    # Create a resource with a specific number of cores, with performance of
+    # each core drawn from a distribution (provided resource is dynamic due to
+    # `var_temporal` input data).
     #
-    # NOTE: Core objects are not generated during Resource initialization
-    #       (by default), but will be generated in the ResourceManager
-    #       (server side). In case, Cores should be defined before the session
-    #       run, please use `set_cores` input flag or a method with this name.
+    # NOTE: Core objects are not generated during the resource initialization
+    #       (by default), but will be generated in the `processing` method of
+    #       ResourceManager class. In case, cores should be defined before the
+    #       session run, please use `set_cores` input flag or a method with the
+    #       same name (e.g., `resource.set_cores()`).
     resource = Resource(num_cores=128,
                         perf_dist={'name': 'uniform',
                                    'mean': 32.,
                                    'var_spatial': 2.,
                                    'var_temporal': 1.})
-    # Create a Workload with a specific number of tasks,
-    # with number of operations per task drawn from a distribution
+    # Create a workload with a specific number of tasks, with number of
+    # operations per task drawn from a distribution.
     #
-    # NOTE: Task objects are not generated during Workload initialization
+    # NOTE: Task objects are not generated during the workload initialization
     #       (by default), which is similar to Resource with Cores behaviour.
-    #       Same as for Resource to generate Task objects explicitly,
+    #       Same as for Resource to generate task objects explicitly,
     #       corresponding input flag and method are `set_tasks`.
     workload = Workload(num_tasks=128,
                         ops_dist={'mean': 1024.})

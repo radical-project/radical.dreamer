@@ -12,8 +12,8 @@
   * `pika` **[optional]**
     * it would be necessary if processes of input setup and actual emulation 
       process are separated either within a local machine or between different 
-      machines and RabbitMQ is used as a communication channel, thus *running*
-      RabbitMQ instance should be installed either locally or remotely
+      machines and RabbitMQ is used as a communication channel, thus RabbitMQ 
+      instance should be installed and *running* either locally or remotely
 
 ## Installation
 1) Virtual environment

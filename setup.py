@@ -32,7 +32,7 @@ if sys.hexversion < 0x03060000:
 setup_args = {
     'name': _PKG_NAME,
     'namespace_packages': ['radical'],
-    'version': '0.2.0',
+    'version': '0.3.0',
     'description': 'Dynamic Runtime and Execution Adaptive Middleware EmulatoR',
     # 'long_description' : (read('README.md') + '\n\n' + read('CHANGES.md')),
     'author': __author__,

@@ -12,7 +12,7 @@ class SessionTestClass(TestCase):
 
     @mock.patch('radical.dreamer.managers._base.generate_id', return_value='S0')
     @mock.patch('radical.dreamer.managers._base.Logger')
-    def test_init(self, mocked_generate_id, mocked_logger):
+    def test_init(self, *args, **kwargs):
 
         with self.assertRaises(Exception):
             # no configuration set

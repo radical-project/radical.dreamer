@@ -16,6 +16,7 @@
       instance should be installed and *running* either locally or remotely
 
 ## Installation
+
 1) Virtual environment
 ```shell script
 # python3 virtualenv

@@ -83,7 +83,7 @@ class Config(Munch):
             'is_adaptive': False
         },
         'session': {
-            'profile_base_name': 'rd.profile'
+            'profile_base_name': None
         }
     }
 

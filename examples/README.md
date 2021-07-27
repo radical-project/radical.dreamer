@@ -15,7 +15,7 @@ wget -q https://raw.githubusercontent.com/radical-project/radical.dreamer/master
 chmod +x run_session_peer.py
 
 ./run_session_peer.py
-# or with debug messages:
+# or with debug messages (provided example already includes flag for debug messages):
 #    RADICAL_DREAMER_LOG_LVL=DEBUG ./run_session_peer.py
 ```
 NOTE: This mode is not set by default and should be defined explicitly during 
@@ -52,7 +52,7 @@ wget -q https://raw.githubusercontent.com/radical-project/radical.dreamer/master
 chmod +x run_session.py
 
 ./run_session.py
-# or with debug messages:
+# or with debug messages (provided example already includes flag for debug messages):
 #    RADICAL_DREAMER_LOG_LVL=DEBUG ./run_session.py
 ```
 

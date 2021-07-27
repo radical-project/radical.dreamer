@@ -97,33 +97,40 @@ class Session(Manager):
                 resource=self._resource,
                 workload=workload,
                 schedule=self._schedule)
+            self._logger.info('Processing finished')
 
             self._set_profile(workload_uid=workload.uid,
                               tasks=processed_tasks)
 
     def _set_profile(self, workload_uid, tasks):
-        for task in tasks:
-            self._profile_data.setdefault(workload_uid, []).append({
-                'task': task['uid'],
-                'ops': task['ops'],
-                'core': task['core_uid'],
-                'start_time': task['start_time'],
-                'end_time': task['end_time'],
-                'exec_time': task['end_time'] - task['start_time']})
+        if self._cfg.profile_base_name:
+
+            for task in tasks:
+                self._profile_data.setdefault(workload_uid, []).append({
+                    'task': task['uid'],
+                    'ops': task['ops'],
+                    'core': task['core_uid'],
+                    'start_time': task['start_time'],
+                    'end_time': task['end_time'],
+                    'exec_time': task['end_time'] - task['start_time']})
 
     def _save_profile(self):
-        self._logger.info('Save profile data records')
-        file_path = os.path.join(
-            os.path.dirname(self._cfg.profile_base_name),
-            '.'.join([os.path.basename(self._cfg.profile_base_name),
-                      generate_id('%(date)s.%(counter)04d', mode=ID_CUSTOM),
-                      'json']))
-        file_name, file_ext = os.path.splitext(file_path)
+        if self._cfg.profile_base_name:
 
-        _idx = 0
-        while os.path.exists(file_path):
-            _idx += 1
-            file_path = '%s_%s%s' % (file_name, _idx, file_ext)
+            self._logger.info('Save profile data records')
+            file_path = os.path.join(
+                os.path.dirname(self._cfg.profile_base_name),
+                '.'.join([os.path.basename(self._cfg.profile_base_name),
+                          generate_id('%(date)s.%(pid)06d', mode=ID_CUSTOM),
+                          'json']))
+            file_name, file_ext = os.path.splitext(file_path)
 
-        write_json(data=self._profile_data, fname=file_path)
-        self._logger.info('Profile records saved to %s' % file_path)
+            idx = 0
+            while True:
+                file_path = '%s_%02d%s' % (file_name, idx, file_ext)
+                if not os.path.exists(file_path):
+                    break
+                idx += 1
+
+            write_json(data=self._profile_data, fname=file_path)
+            self._logger.info('Profile records saved to %s' % file_path)

@@ -9,6 +9,6 @@ cfg_default = Config(from_dict={
         'is_adaptive': False
     },
     'session': {
-        'profile_base_name': './rd.profile'
+        'profile_base_name': 'rd.profile'
     }
 })

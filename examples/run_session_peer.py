@@ -5,11 +5,15 @@ __email__     = 'info@radical-cybertools.org'
 __copyright__ = 'Copyright 2021, The RADICAL-Cybertools Team'
 __license__   = 'MIT'
 
+import os
+
 from radical.dreamer import Session, Resource, Workload
 from radical.dreamer.configs import cfg_default
 
 
 if __name__ == '__main__':
+    os.environ['RADICAL_DREAMER_LOG_LVL'] = 'DEBUG'
+
     # Create a resource with a specific number of cores, with performance of
     # each core drawn from a distribution (provided resource is dynamic due to
     # `var_temporal` input data).
@@ -49,7 +53,7 @@ if __name__ == '__main__':
 #
 # cfg_data = {
 #     'session': {
-#         'profile_base_name': './rd.profile'
+#         'profile_base_name': 'rd.profile'
 #     },
 #     'schedule': {
 #         'strategy': 'largest_to_fastest',

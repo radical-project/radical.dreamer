@@ -6,7 +6,7 @@ import glob
 
 import radical.utils as ru
 
-from radical.dreamer.units import Core, Task
+from radical.dreamer.units import Core, Task, CORE_STATE
 
 from unittest import TestCase
 
@@ -32,11 +32,12 @@ class CoreTestClass(TestCase):
         self.assertFalse(c.perf_history)
         self.assertIsInstance(c.perf_history, list)
         self.assertEqual(c.io_rate, 0.)
+        self.assertEqual(c.io_time, 0.)
         self.assertEqual(c.acquire_time, 0.)
         self.assertEqual(c.release_time, 0.)
+        self.assertEqual(c.planned_compute_time, 0.)
         self.assertEqual(c.planned_release_time, 0.)
-        self.assertEqual(c.planned_execute_time, 0.)
-        self.assertEqual(c.state, Core.STATES.Idle)
+        self.assertEqual(c.state, CORE_STATE.Idle)
 
         # with input data
         for test_case in self._test_cases:
@@ -54,12 +55,13 @@ class CoreTestClass(TestCase):
             self.assertEqual(c.perf_dynamic, result['perf_dynamic'])
             self.assertEqual(c.perf_history, result['perf_history'])
             self.assertEqual(c.io_rate, result['io_rate'])
+            self.assertEqual(c.io_time, result['io_time'])
             self.assertEqual(c.acquire_time, result['acquire_time'])
             self.assertEqual(c.release_time, result['release_time'])
+            self.assertEqual(c.planned_compute_time,
+                             result['planned_compute_time'])
             self.assertEqual(c.planned_release_time,
                              result['planned_release_time'])
-            self.assertEqual(c.planned_execute_time,
-                             result['planned_execute_time'])
             self.assertEqual(c.state, result['state'])
 
     def test_execute(self):
@@ -77,14 +79,17 @@ class CoreTestClass(TestCase):
 
             result = test_case['result_execute']
             self.assertIsInstance(ret_c, Core)
+            self.assertEqual(ret_c.io_time, result['io_time'])
             self.assertEqual(ret_c.acquire_time, previous_release_time)
             self.assertEqual(ret_c.release_time, result['release_time'])
+            self.assertEqual(ret_c.planned_compute_time,
+                             result['planned_compute_time'])
             self.assertEqual(ret_c.planned_release_time,
                              result['planned_release_time'])
-            self.assertEqual(ret_c.planned_execute_time,
-                             result['planned_execute_time'])
-            self.assertEqual(ret_c.planned_execute_time,
-                             ret_c.planned_release_time - ret_c.acquire_time)
+            self.assertEqual(ret_c.planned_compute_time,
+                             ret_c.planned_release_time
+                             - ret_c.acquire_time
+                             - ret_c.io_time)
             self.assertTrue(ret_c.is_busy)
 
             self.assertEqual(t.start_time, ret_c.acquire_time)
@@ -102,11 +107,12 @@ class CoreTestClass(TestCase):
 
             c.execute(task=t)
             perf_history_len = len(c.perf_history)
-            self.assertEqual(c.state, Core.STATES.Busy)
+            self.assertEqual(c.state, CORE_STATE.Busy)
 
             ret_c = c.release()
             self.assertIsInstance(ret_c, Core)
             self.assertEqual(ret_c.perf_dynamic, ret_c.perf_history[-1])
             self.assertEqual(len(ret_c.perf_history), perf_history_len + 1)
             self.assertFalse(ret_c.is_busy)
-            self.assertFalse(ret_c.planned_execute_time)
+            self.assertFalse(ret_c.io_time)
+            self.assertFalse(ret_c.planned_compute_time)

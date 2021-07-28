@@ -62,8 +62,9 @@ class ResourceCoresMixin:
                 perf_current = core.perf
                 if core.planned_release_time < self._timestamp:
                     # decreased value of performance
-                    perf_current *= core.planned_execute_time / \
-                                    (self._timestamp - core.acquire_time)
+                    perf_current *= \
+                        core.planned_compute_time / \
+                        (self._timestamp - core.acquire_time - core.io_time)
                 output[core.uid].append(perf_current)
         return output
 

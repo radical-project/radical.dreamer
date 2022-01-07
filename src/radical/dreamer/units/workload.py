@@ -1,6 +1,7 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
 
+from ..utils import Munch
 from .task import Task
 from .ext import SampleDistribution
 

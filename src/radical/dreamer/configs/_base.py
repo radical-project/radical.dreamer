@@ -1,9 +1,9 @@
 
 import socket
 
-from radical.utils import read_json, Munch
+from radical.utils import read_json
 
-from ..utils import EnumTypes
+from ..utils import EnumTypes, Munch
 
 BINDING_PROTOCOL = EnumTypes(
     ('Early', 'early'),

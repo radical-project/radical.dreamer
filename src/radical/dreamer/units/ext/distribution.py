@@ -1,9 +1,7 @@
 
 from numpy.random import RandomState
 
-from radical.utils import Munch
-
-from ...utils import EnumTypes
+from ...utils import EnumTypes, Munch
 
 
 class SampleDistribution(Munch):

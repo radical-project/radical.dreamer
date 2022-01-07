@@ -1,5 +1,7 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
+
+from ..utils import Munch
 
 
 class Task(Munch):

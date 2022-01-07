@@ -1,7 +1,7 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
 
-from ..utils import EnumTypes
+from ..utils import EnumTypes, Munch
 
 
 CORE_STATE = EnumTypes(

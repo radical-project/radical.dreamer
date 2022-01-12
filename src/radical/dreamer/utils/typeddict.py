@@ -104,6 +104,7 @@ class TypedDict(metaclass=TypedDictMeta):
                   iterkeys
                   itervalues
                   keys
+                  pop
                   popitem
                   setdefault
                   update
@@ -216,6 +217,16 @@ class TypedDict(metaclass=TypedDictMeta):
             self[key] = default
             return default
         return self[key]
+
+    def pop(self, key, default=None):
+        if key in self:
+            value = self[key]
+            del self[key]
+            return value
+        elif default is not None:
+            return default
+        else:
+            raise TDError('key "%s" not found' % key)
 
     def popitem(self):
         key = list(self.keys())[0]

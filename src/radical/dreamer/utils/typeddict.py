@@ -229,10 +229,13 @@ class TypedDict(metaclass=TypedDictMeta):
             raise TDError('key "%s" not found' % key)
 
     def popitem(self):
-        key = list(self.keys())[0]
-        value = self[key]
-        del self[key]
-        return key, value
+        if len(self):
+            key = list(self.keys())[-1]  # LIFO if applicable
+            value = self[key]
+            del self[key]
+            return key, value
+        else:
+            raise TDError('no data')
 
     def clear(self):
         for key in self:

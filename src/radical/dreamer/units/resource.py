@@ -1,7 +1,8 @@
 
 from radical.utils import generate_id
 
-from ..utils import Munch
+from ..utils import TypedDict
+
 from .core import Core
 from .ext import SampleDistribution
 
@@ -70,7 +71,7 @@ class ResourceCoresMixin:
         return output
 
 
-class Resource(ResourceCoresMixin, Munch):
+class Resource(ResourceCoresMixin, TypedDict):
 
     _schema = {
         'uid': str,

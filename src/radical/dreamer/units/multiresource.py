@@ -1,11 +1,12 @@
 
 from radical.utils import generate_id
 
-from ..utils import Munch
+from ..utils import TypedDict
+
 from .resource import Resource, ResourceCoresMixin
 
 
-class MultiResource(ResourceCoresMixin, Munch):
+class MultiResource(ResourceCoresMixin, TypedDict):
 
     _schema = {
         'uid': str,

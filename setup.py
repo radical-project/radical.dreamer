@@ -8,7 +8,7 @@
 
 __author__    = 'RADICAL-Cybertools Team'
 __email__     = 'info@radical-cybertools.org'
-__copyright__ = 'Copyright 2020-2021, The RADICAL-Cybertools Team'
+__copyright__ = 'Copyright 2020-2022, The RADICAL-Cybertools Team'
 __license__   = 'MIT'
 
 """ Setup script. Used by easy_install and pip. """
@@ -62,9 +62,9 @@ setup_args = {
     'packages': find_namespace_packages('src', include=['radical.*']),
     'package_dir': {'': 'src'},
     'package_data': {'': ['*.sh', '*.json', 'VERSION', 'SDIST']},
-    'install_requires': ['radical.utils>=1.5.7',
+    'install_requires': ['radical.utils>=1.12',
                          'numpy',
-                         'pika'],
+                         'pika>=1'],
     'tests_require': ['pytest',
                       'pylint',
                       'flake8',

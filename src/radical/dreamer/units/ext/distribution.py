@@ -1,12 +1,10 @@
 
 from numpy.random import RandomState
 
-from radical.utils import Munch
-
-from ...utils import EnumTypes
+from ...utils import EnumTypes, TypedDict
 
 
-class SampleDistribution(Munch):
+class SampleDistribution(TypedDict):
 
     NAMES = EnumTypes(
         ('Normal', 'normal'),

@@ -1,11 +1,13 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
+
+from ..utils import TypedDict
 
 from .task import Task
 from .ext import SampleDistribution
 
 
-class Workload(Munch):
+class Workload(TypedDict):
 
     _schema = {
         'uid': str,

@@ -1,7 +1,7 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
 
-from ..utils import EnumTypes
+from ..utils import EnumTypes, TypedDict
 
 
 CORE_STATE = EnumTypes(
@@ -11,7 +11,7 @@ CORE_STATE = EnumTypes(
 )
 
 
-class Core(Munch):
+class Core(TypedDict):
 
     _schema = {
         'uid': str,

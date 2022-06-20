@@ -1,7 +1,8 @@
 
 import math
 
-from ..units import MultiResource, Resource, Task, Workload
+from ..units import MultiResource, Resource, Workload
+from ..utils import as_dict
 
 from ._base import Manager
 from .ext import Schedule
@@ -136,5 +137,5 @@ class ResourceManager(Manager):
                 # publish profile data
                 self._rmq.publish(
                     queue=self._rmq_queues.profile,
-                    data=Task.demunch(tasks[idx * PROFILE_MSG_SIZE:
-                                            (idx + 1) * PROFILE_MSG_SIZE]))
+                    data=as_dict(tasks[idx * PROFILE_MSG_SIZE:
+                                       (idx + 1) * PROFILE_MSG_SIZE]))

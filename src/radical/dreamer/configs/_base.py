@@ -1,9 +1,9 @@
 
 import socket
 
-from radical.utils import read_json, Munch
+from radical.utils import read_json
 
-from ..utils import EnumTypes
+from ..utils import EnumTypes, TypedDict
 
 BINDING_PROTOCOL = EnumTypes(
     ('Early', 'early'),
@@ -23,7 +23,7 @@ UNIQ_ID = '%s.%s' % ('nouser' if getpass is None else getpass.getuser(),
                      socket.gethostname())
 
 
-class RMQQueueNames(Munch):
+class RMQQueueNames(TypedDict):
     _schema = {
         'profile': str,
         'resource': str,
@@ -32,7 +32,7 @@ class RMQQueueNames(Munch):
     }
 
 
-class RMQConfig(Munch):
+class RMQConfig(TypedDict):
     _schema = {
         'url': str,
         'exchange': str,
@@ -40,7 +40,7 @@ class RMQConfig(Munch):
     }
 
 
-class ScheduleConfig(Munch):
+class ScheduleConfig(TypedDict):
     _schema = {
         'strategy': str,
         'early_binding': bool,
@@ -48,13 +48,13 @@ class ScheduleConfig(Munch):
     }
 
 
-class SessionConfig(Munch):
+class SessionConfig(TypedDict):
     _schema = {
         'profile_base_name': str
     }
 
 
-class Config(Munch):
+class Config(TypedDict):
 
     """
     Base class to keep the config data.

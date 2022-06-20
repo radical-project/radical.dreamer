@@ -1,8 +1,10 @@
 
-from radical.utils import generate_id, Munch
+from radical.utils import generate_id
+
+from ..utils import TypedDict
 
 
-class Task(Munch):
+class Task(TypedDict):
 
     _schema = {
         'uid': str,

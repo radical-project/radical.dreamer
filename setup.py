@@ -25,6 +25,7 @@ from setuptools import setup, Command, find_namespace_packages
 
 
 # ------------------------------------------------------------------------------
+#
 base     = 'dreamer'
 name     = 'radical.%s'      % base
 mod_root = 'src/radical/%s/' % base
@@ -32,7 +33,6 @@ mod_root = 'src/radical/%s/' % base
 root = os.path.dirname(__file__) or '.'
 
 # ------------------------------------------------------------------------------
-#
 # pip warning:
 # "In-tree builds are now default. pip 22.1 will enforce this behaviour change.
 #  A possible replacement is to remove the --use-feature=in-tree-build flag."
@@ -68,7 +68,6 @@ def sh_callout(cmd):
 
 
 # ------------------------------------------------------------------------------
-#
 # versioning mechanism:
 #
 #   - version:          1.2.3            - is used for installation
@@ -76,16 +75,14 @@ def sh_callout(cmd):
 #   - version is read from VERSION file in root, which then is copied to
 #     module dir, and is getting installed from there.
 #   - version_detail is derived from the git tag, and only available when
-#     installed from git.  That is stored in mod_root/VERSION in the install
-#     tree.
+#     installed from git.  That is stored in mod_root/VERSION in the
+#     installation tree.
 #   - The VERSION file is used to provide the runtime version information.
-#
 def get_version(_mod_root):
     """
     VERSION file contains version strings is created in mod_root during
     installation. That file is used at runtime to get the version information.
     """
-
     try:
 
         _version_base   = None
@@ -188,7 +185,6 @@ class RunTwine(Command):
 
 
 # ------------------------------------------------------------------------------
-#
 # This copies the contents like examples/ dir under sys.prefix/share/$name
 # It needs the MANIFEST.in entries to work.
 base = 'share/%s' % name

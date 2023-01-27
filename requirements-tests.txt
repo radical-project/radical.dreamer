@@ -1,0 +1,8 @@
+
+-r requirements.txt
+
+codecov
+coverage
+flake8
+pylint
+pytest

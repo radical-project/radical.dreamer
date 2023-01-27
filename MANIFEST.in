@@ -1,0 +1,6 @@
+
+include *.py *.json *.md *.sh *.txt
+include MANIFEST.in README.md CHANGES.md CONTRIBUTORS.md LICENSE.md VERSION
+
+recursive-include src      *.sh *.json
+recursive-include examples *.py *.json
